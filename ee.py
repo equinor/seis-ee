@@ -1,7 +1,10 @@
 #! /usr/bin/env python
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+
+# How long a period each file covers, in seconds
+files_time_slices = 9 - 1
 
 
 def path_to_dates(path: Path):
@@ -12,52 +15,60 @@ def path_to_dates(path: Path):
         return
 
     try:
-        first_hour = int(elements[3][:2])
-        first_minute = int(elements[3][2:4])
-        second_hour = int(elements[4][:2])
-        second_minute = int(elements[4][2:4])
-
-        first_date = datetime(int(elements[0]), int(elements[1]), int(elements[2]), first_hour, first_minute)
-        second_date = datetime(int(elements[0]), int(elements[1]), int(elements[2]), second_hour, second_minute)
+        first_date = datetime(year=int(elements[0]), month=int(elements[1]), day=int(elements[2]),
+                              hour=int(elements[3]), minute=int(elements[4]), second=int(elements[5]))
     except Exception as e:
         print(f"Failed to parse filename into date; {path.name}")
         print(e)
         return
-
-    return {"path": path, "from": first_date, "to": second_date, "range": second_date - first_date}
-
-
-def find_file(time_range, files) -> Path:
-    for f in files:
-        # check if input range 'from' is between the dates in file
-        if f["from"] <= time_range["from"] < f["to"]:
-            print(f"Found file! {f['path'].name}")
-            return f["path"]
-
-        # check if input range 'to' is between the dates in file
-        if f["from"] <= time_range["to"] < f["to"]:
-            print(f"Found file! {f['path'].name}")
-            return f["path"]
+    res = {"path": path, "from": first_date}
+    return res
 
 
-def main():
-    started = datetime.now()
+# TODO: Optimize: Stop iterating files when the requested time slice has been found.
+
+def find_file(time_range, file) -> Path:
+    f_start = file["from"]
+    f_end = file["from"] + timedelta(seconds=8)
+    req_start = time_range["from"]
+    req_end = time_range["to"]
+
+    # Check if either start of file, or end of file is inside requested time range
+    if req_start <= f_start <= req_end or req_start <= f_end and f_end >= req_end:
+        print(f"Found file! {file['path'].name} --- Requested: {req_start} ==> {req_end}")
+        return file["path"]
+
+
+def load_requested_times():
     time_objects = []
-
     with open("test_data/input.csv") as csvfile:
         reader = csv.reader(csvfile, delimiter=" ")
         for row in reader:
-            time_objects.append({"event": datetime.fromisoformat(row[0]),
-                                 "to": datetime.fromisoformat(row[1]),
-                                 "from": datetime.fromisoformat(row[2])})
+            time_objects.append({"from": datetime.fromisoformat(row[1]),
+                                 "to": datetime.fromisoformat(row[2])})
+    return time_objects
 
-    path = Path("./test_data")
+
+def get_needed_files_as_dates(path, requested_times):
+    path = Path(path)
     files = [x for x in path.rglob("*") if x.is_file()]
     files_as_dates = [path_to_dates(f) for f in files]
     files_as_dates = [x for x in files_as_dates if x]
 
-    needed_files = [find_file(i, files_as_dates) for i in time_objects]
-    needed_files = [x for x in needed_files if x]
+    needed_files = []
+    for i in requested_times:
+        for f in files_as_dates:
+            result = find_file(i, f)
+            if result:
+                needed_files.append(result)
+    return needed_files
+
+
+def main():
+    started = datetime.now()
+
+    requested_times = load_requested_times()
+    needed_files = get_needed_files_as_dates("./test_data/grane/tmp", requested_times)
 
     path_set = set([f"{x.absolute().parent}/{x.name}" for x in needed_files])
     print("############################################")
