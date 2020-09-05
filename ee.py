@@ -7,7 +7,7 @@ from pathlib import Path
 files_time_slices = 9 - 1
 
 
-def path_to_dates(path: Path):
+def grane_path_to_dates(path: Path):
     # Try splitting the filename
     elements = path.name.split("-")
     if len(elements) < 5:
@@ -21,7 +21,7 @@ def path_to_dates(path: Path):
         print(f"Failed to parse filename into date; {path.name}")
         print(e)
         return
-    res = {"path": path, "from": first_date}
+    res = {"path": path, "from": first_date, "to": first_date + timedelta(seconds=8)}
     return res
 
 
@@ -29,13 +29,13 @@ def path_to_dates(path: Path):
 
 def find_file(time_range, file) -> Path:
     f_start = file["from"]
-    f_end = file["from"] + timedelta(seconds=8)
+    f_end = file["to"]
     req_start = time_range["from"]
     req_end = time_range["to"]
 
     # Check if either start of file, or end of file is inside requested time range
-    if req_start <= f_start <= req_end or req_start <= f_end and f_end >= req_end:
-        print(f"Found file! {file['path'].name} --- Requested: {req_start} ==> {req_end}")
+    if req_start <= f_start <= req_end or req_start <= f_end <= req_end:
+        print(f"Found file! {file['path']} --- Requested: {req_start} ==> {req_end}")
         return file["path"]
 
 
@@ -43,16 +43,23 @@ def load_requested_times():
     time_objects = []
     with open("test_data/input.csv") as csvfile:
         reader = csv.reader(csvfile, delimiter=" ")
-        for row in reader:
-            time_objects.append({"from": datetime.fromisoformat(row[1]),
-                                 "to": datetime.fromisoformat(row[2])})
+        for i, row in enumerate(reader):
+            r_from = datetime.fromisoformat(row[1])
+            r_to = datetime.fromisoformat(row[2])
+
+            # Test for invalid range (from larger than to)
+            if r_from >= r_to:
+               print(f"Warning: row {i} is invalid. From date is ending before to date. Skipping...")
+               continue
+            time_objects.append({"from": r_from,
+                                 "to": r_to})
     return time_objects
 
 
 def get_needed_files_as_dates(path, requested_times):
     path = Path(path)
     files = [x for x in path.rglob("*") if x.is_file()]
-    files_as_dates = [path_to_dates(f) for f in files]
+    files_as_dates = [grane_path_to_dates(f) for f in files]
     files_as_dates = [x for x in files_as_dates if x]
 
     needed_files = []
@@ -68,11 +75,11 @@ def main():
     started = datetime.now()
 
     requested_times = load_requested_times()
-    needed_files = get_needed_files_as_dates("./test_data/grane/tmp", requested_times)
+    needed_files = get_needed_files_as_dates("test_data/grane/tmp", requested_times)
 
     path_set = set([f"{x.absolute().parent}/{x.name}" for x in needed_files])
     print("############################################")
-    print("               Finnished!")
+    print("               Finished!")
     print(f"    Run took {datetime.now() - started} (dd:hh:mm:ss)")
     print("############################################")
     for i in path_set:
