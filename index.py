@@ -1,10 +1,9 @@
 import os
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 from sqlite3 import Error
 from typing import Dict, List
-
-import click
 
 DB_TABEL = "file_index"
 
@@ -19,7 +18,7 @@ def create_connection():
 
 
 def insert_index(connection, index: List[Dict]):
-    print(f"Will insert values; {index}")
+    print(f"Will insert {len(index)} values...")
     values = [f'(\"{i}\", \"test\", \"test\")' for i in index]
     linked = ", ".join(values)
 
@@ -28,13 +27,16 @@ def insert_index(connection, index: List[Dict]):
     cursor = connection.cursor()
     cursor.execute(query)
     connection.commit()
-    print("Done!")
     return cursor.lastrowid
 
 
-@click.command()
-def create_index():
-    os.remove("sqlite.db")
+def create_index(location):
+    print(f"Creating index of files in '{location}'")
+    start = datetime.now()
+    try:
+        os.remove("sqlite.db")
+    except FileNotFoundError:
+        pass
 
     connection = create_connection()
     cursor = connection.cursor()
@@ -47,11 +49,13 @@ def create_index():
 
     cursor.execute(sql_create_table)
     print("Created SQL tabel")
-    path = Path("./test_data")
+    path = Path(location)
     index = [str(x.absolute()) for x in path.rglob("*") if x.is_file()]
 
     insert_index(connection, index)
+    done = datetime.now() - start
+    print(f"Done! Took {done} to crate index with {len(index)} entries")
 
 
 if __name__ == '__main__':
-    create_index()
+    create_index("./test_data")
