@@ -2,3 +2,7 @@
 /.idea/
 /sqlite.db
 *__pycache__*
+/result.txt
+/papers/
+/test_data-result.txt
+/test_data/segd-test.sgd
