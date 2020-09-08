@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 import csv
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import click
-
 # How long a period each file covers, in seconds
+
 files_time_slices = 9 - 1
 
 
@@ -81,18 +79,7 @@ def load_requested_times(input):
     return time_objects
 
 
-def print_help_and_exit():
-    ctx = click.get_current_context()
-    print(ctx.get_help())
-    exit(1)
-
-
-@click.command()
-@click.option("--target", "-t", default=os.getcwd(), type=str, help="Location of files to find. Default '.'")
-@click.option("--input", "-i", required=True, type=str, help="CSV-file with time ranges to find.")
-@click.option("--format", type=str, default="filename",
-              help="How to find the time range covered by the file. Valid formats are 'filename' or 'segy'")
-def main(target, input, format):
+def file_finder(target, input, format):
     if not Path(target).exists():
         print(f"ERROR: Target '{target}' does not exist")
         print_help_and_exit()
@@ -125,4 +112,4 @@ def main(target, input, format):
 
 
 if __name__ == '__main__':
-    main()
+    file_finder()

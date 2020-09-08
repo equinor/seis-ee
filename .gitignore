@@ -6,3 +6,6 @@
 /papers/
 /test_data-result.txt
 /test_data/segd-test.sgd
+/test_data/
+/decimate-0.4.0/
+/segdpy/

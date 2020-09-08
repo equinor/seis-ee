@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from index import create_connection, create_index, DB_TABEL
+from seis_ee.index import create_connection, create_index, DB_TABEL
 
 
 def list_from_fs(location):
