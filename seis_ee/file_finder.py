@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # How long a period each file covers, in seconds
+from utils import print_help_and_exit
 
 files_time_slices = 9 - 1
 
@@ -79,15 +80,15 @@ def load_requested_times(input):
     return time_objects
 
 
-def file_finder(target, input, format):
+def file_finder(target, requested_times, format):
     if not Path(target).exists():
         print(f"ERROR: Target '{target}' does not exist")
         print_help_and_exit()
-    if not Path(input).exists():
-        print(f"ERROR: Input file '{input}' does not exist")
+    if not Path(requested_times).exists():
+        print(f"ERROR: Input file '{requested_times}' does not exist")
         print_help_and_exit()
-    if not Path(input).is_file():
-        print(f"ERROR: Input target '{input}' is not a file")
+    if not Path(requested_times).is_file():
+        print(f"ERROR: Input target '{requested_times}' is not a file")
         print_help_and_exit()
     if not format.casefold() in ("filename", "segy"):
         print(f"ERROR: Invalid format; {format}")
@@ -95,7 +96,7 @@ def file_finder(target, input, format):
 
     started = datetime.now()
 
-    requested_times = load_requested_times(input)
+    requested_times = load_requested_times(requested_times)
     needed_files = get_timerange_from_filename(target, requested_times)
 
     path_set = set([f"{x.absolute().parent}/{x.name}" for x in needed_files])

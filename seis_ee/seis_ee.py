@@ -3,9 +3,9 @@ import os
 
 import click
 
+from copy_files import copy_files as _copy_files
 from extractors.decimate import decimate_files
 from file_finder import file_finder
-from copy_files import copy_files as _copy_files
 
 
 @click.group()
@@ -30,11 +30,12 @@ def find_files(target, input, format):
 def copy_files(file_list, format):
     _copy_files(file_list, format)
 
+
 @cli.command()
-@click.option("-s", "--sensor-list", type=str,
-              help="Path to a file containing the sensors to keep. Separated with newline.")
 @click.option("-f", "--file-list", type=str,
               help="Path to a file containing files to reduce. Every file separated with newline")
+@click.option("-s", "--sensor-list", type=str,
+              help="Path to a file containing the sensors to keep. Separated with newline.")
 @click.option("--format", type=str,
               help="Format of the files to reduce. One of (segd-grane, su-oseberg)")
 def reduce_files(file_list, sensor_list, format):
