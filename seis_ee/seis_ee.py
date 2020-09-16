@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import logging
 import os
 
 import click
@@ -7,9 +8,15 @@ from copy_files import copy_files as _copy_files
 from extractors.decimate import decimate_files
 from file_finder import file_finder
 
+logger = logging.getLogger("logger")
+
 
 @click.group()
-def cli():
+@click.option("--log-level", "-l", default="error", type=click.Choice(['info', 'warning', 'error'], case_sensitive=False),
+              help="Log level. One of 'info', 'warning', 'error'")
+def cli(log_level):
+    logger.setLevel(log_level.upper())
+    print(logger.getEffectiveLevel())
     pass
 
 

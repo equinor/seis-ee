@@ -6,4 +6,4 @@ services:
     volumes:
       - .:/data
       # Update this line with your raw data location
-      - ./test_data/grane/full-files/:/raw
+      - /project/grane-passive/:/raw

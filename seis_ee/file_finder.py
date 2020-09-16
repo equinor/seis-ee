@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import csv
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -107,7 +108,9 @@ def file_finder(target, requested_times, format):
 
     target_pretty = Path(target).stem
 
-    with open(f"./{target_pretty}-result.txt", "w") as res_file:
+    result_file = f"{os.getcwd()}/{target_pretty}-result.txt"
+    print(f"Writing result into {result_file}")
+    with open(result_file, "w") as res_file:
         for i in path_set:
             res_file.write(i + "\n")
 
