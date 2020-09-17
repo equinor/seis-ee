@@ -3,10 +3,12 @@ import csv
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Dict
+
+
+from utils import print_help_and_exit, logger
 
 # How long a period each file covers, in seconds
-from utils import print_help_and_exit
-
 files_time_slices = 9 - 1
 
 
@@ -30,7 +32,7 @@ def grane_path_to_dates(path: Path):
 
 # TODO: Optimize: Stop iterating files when the requested time slice has been found.
 
-def find_file(time_range, file) -> Path:
+def find_file(time_range, file) -> Dict:
     f_start = file["from"]
     f_end = file["to"]
     req_start = time_range["from"]
@@ -39,7 +41,7 @@ def find_file(time_range, file) -> Path:
     # Check if either start of file, or end of file is inside requested time range
     if req_start <= f_start <= req_end or req_start <= f_end <= req_end:
         print(f"Found file! {file['path']} --- Requested: {req_start} ==> {req_end}")
-        return file["path"]
+        return {"path": str(file["path"].absolute()), "event": str(time_range["event"])}
 
 
 def get_timerange_from_filename(path, requested_times):
@@ -69,6 +71,7 @@ def load_requested_times(input):
             # Skip empty rows
             if not row:
                 continue
+            r_event = datetime.fromisoformat(row[0])
             r_from = datetime.fromisoformat(row[1])
             r_to = datetime.fromisoformat(row[2])
 
@@ -76,7 +79,8 @@ def load_requested_times(input):
             if r_from >= r_to:
                 print(f"Warning: row {i} is invalid. From date is ending before to date. Skipping...")
                 continue
-            time_objects.append({"from": r_from,
+            time_objects.append({"event": r_event,
+                                 "from": r_from,
                                  "to": r_to})
     return time_objects
 
@@ -96,24 +100,24 @@ def file_finder(target, requested_times, format):
         print_help_and_exit()
 
     started = datetime.now()
+    logger.info(f"Looking for files recursively in {target}. This could take a while...")
 
     requested_times = load_requested_times(requested_times)
     needed_files = get_timerange_from_filename(target, requested_times)
 
-    path_set = set([f"{x.absolute().parent}/{x.name}" for x in needed_files])
     print("############################################")
     print("               Finished!")
     print(f"    Run took {datetime.now() - started} (dd:hh:mm:ss)")
+    logger.info(f"    Found {len(needed_files)} files")
     print("############################################")
 
-    target_pretty = Path(target).stem
-
-    result_file = f"{os.getcwd()}/{target_pretty}-result.txt"
+    result_file = f"{os.getcwd()}/{Path(target).stem}-result.csv"
     print(f"Writing result into {result_file}")
     with open(result_file, "w") as res_file:
-        for i in path_set:
-            res_file.write(i + "\n")
+        writer = csv.DictWriter(res_file, fieldnames=["path", "event"])
+        writer.writeheader()
+        writer.writerows(needed_files)
 
 
 if __name__ == '__main__':
-    file_finder()
+    file_finder("./test_data", "./requested-times.txt", "filename")

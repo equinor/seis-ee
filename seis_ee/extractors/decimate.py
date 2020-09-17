@@ -4,6 +4,9 @@ import os
 import subprocess
 from datetime import datetime
 from enum import Enum
+from typing import Dict, List
+
+from config import Config
 
 decimate_result_location = "/data/decimated_files"
 
@@ -13,10 +16,10 @@ class DecimateFormat(Enum):
     SU_OSEBERG = "su-oseberg"
 
 
-def get_files(path: str):
-    with open(path) as file:
-        files = file.read().splitlines()
-        return files
+def get_files(path: str) -> List[Dict]:
+    with open(path) as csvfile:
+        reader = csv.DictReader(csvfile)
+        return [row for row in reader]
 
 
 def get_nodes(path: str):
@@ -25,19 +28,26 @@ def get_nodes(path: str):
         return [int(row["nodeName"]) for row in reader if row]
 
 
-def decimate_grane(file, nodes):
+def decimate_grane(file_dict, nodes):
     conf = {
-        "name": "",
+        "name": "hnet",
         "format": DecimateFormat.SEGD_GRANE.value,
         "description": "30 nodes from grane for HNET",
         "included_nodenames": nodes
     }
     conf_string = json.dumps(conf)
+
+    event_as_friendly_name = file_dict["event"].replace(" ", "-").replace(":", "-")
+    destination = f"{Config.decimated_files_dest}/{event_as_friendly_name}"
+
+    # Workaround for bug where Decimate crashes with missing dir
+    os.makedirs(destination, exist_ok=True)
+
     try:
-        print(f"Decimating {file}...")
+        print(f"Decimating {file_dict['path']}...")
         # decimate_process = subprocess.run(args=f"../../decimate -y -confstring '{conf_string}' --ignore-missing {file}",
         decimate_process = subprocess.run(
-            args=f"decimate -y --rotate=false --ignore-missing --dst /data/decimated_files --confstring '{conf_string}' {file}",
+            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")
 
         print(decimate_process.stderr)
@@ -70,8 +80,6 @@ def decimate_oseberg(file, nodes):
 
 def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
     start = datetime.now()
-    # Workaround for bug where Decimate crashes with missing dir
-    os.makedirs(decimate_result_location, exist_ok=True)
 
     files_to_decimate_file = get_files(files_to_decimate_file)
     nodes_to_keep = get_nodes(sensor_nodes_file)
@@ -82,7 +90,7 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
             try:
                 decimate_grane(line, nodes_to_keep)
             except Exception as e:
-                failed_in_some_way.append(f"{line};exit_code: {e}")
+                failed_in_some_way.append(f"{line['path']};exit_code: {e}")
     elif format == DecimateFormat.SU_OSEBERG.value:
         for line in files_to_decimate_file:
             try:
@@ -107,7 +115,10 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
 
 if __name__ == '__main__':
     # files_to_decimate = get_files("../test_result.txt")
-    nodes_to_keep = get_nodes("../../../sensors.txt/grane_nodes.csv")
+    nodes_to_keep = get_nodes("/private/stoo/git/seis-ee/sensors.txt")
+
+    decimate_files("/private/stoo/git/seis-ee/test_data-result.csv", "/private/stoo/git/seis-ee/sensors.txt",
+                   "segd-grane")
 
     # for f in files_to_decimate:
     decimate_grane("/private/stoo/git/seis-ee/test_data/grane/full-files/2020-07-24-11-43-47-Grane2128990.sgd",

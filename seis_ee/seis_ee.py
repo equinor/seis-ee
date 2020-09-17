@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-import logging
 import os
 
 import click
@@ -7,8 +6,7 @@ import click
 from copy_files import copy_files as _copy_files
 from extractors.decimate import decimate_files
 from file_finder import file_finder
-
-logger = logging.getLogger("logger")
+from utils import logger
 
 
 @click.group()
@@ -16,17 +14,16 @@ logger = logging.getLogger("logger")
               help="Log level. One of 'info', 'warning', 'error'")
 def cli(log_level):
     logger.setLevel(log_level.upper())
-    print(logger.getEffectiveLevel())
     pass
 
 
 @cli.command()
 @click.option("--target", "-t", default=os.getcwd(), type=str, help="Location of files to find. Default '.'")
-@click.option("--input", "-i", required=True, type=str, help="CSV-file with time ranges to find.")
+@click.option("--events", "-e", required=True, type=str, help="CSV-file with time ranges for the events to find.")
 @click.option("--format", type=str, default="filename",
               help="How to find the time range covered by the file. Valid formats are 'filename' or 'segy'")
-def find_files(target, input, format):
-    file_finder(target, input, format)
+def find_files(target, events, format):
+    file_finder(target, events, format)
 
 
 @cli.command()

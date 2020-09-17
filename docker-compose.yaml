@@ -2,8 +2,17 @@ version: "3.4"
 services:
   seis_ee:
     image: seis-ee
+#    entrypoint: bash
     build: .
+    environment:
+      DECIMATED_FILES_DEST: "/data/decimated_files"
     volumes:
       - .:/data
-      # Update this line with your raw data location
+#       Update this line with your raw data location
+#      - type: bind
+#        source: /project/grane-passive/
+#        target: /raw
       - /project/grane-passive/:/raw
+#      - /project/grane-passive/G15C_CT4_DY1_drilling/:/raw
+#      - /private/stoo/.ssh:/home/stoo/.ssh
+#    privileged: true

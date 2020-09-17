@@ -1,4 +1,8 @@
+import logging
+
 import click
+
+logger = logging.getLogger("logger")
 
 
 def print_help_and_exit():
