@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from seis_ee.file_finder import grane_path_to_dates
+from find_files.filename import grane_path_to_dates
 
 
 class PathToDates(unittest.TestCase):

@@ -13,12 +13,12 @@ def create_connection():
     try:
         return sqlite3.connect("./sqlite.db")
     except Error as e:
-        print(e)
+        logger.info(e)
         raise Exception(e)
 
 
 def insert_index(connection, index: List[Dict]):
-    print(f"Will insert {len(index)} values...")
+    logger.info(f"Will insert {len(index)} values...")
     values = [f'(\"{i}\", \"test\", \"test\")' for i in index]
     linked = ", ".join(values)
 
@@ -31,7 +31,7 @@ def insert_index(connection, index: List[Dict]):
 
 
 def create_index(location):
-    print(f"Creating index of files in '{location}'")
+    logger.info(f"Creating index of files in '{location}'")
     start = datetime.now()
     try:
         os.remove("sqlite.db")
@@ -48,13 +48,13 @@ def create_index(location):
                                         ); """
 
     cursor.execute(sql_create_table)
-    print("Created SQL tabel")
+    logger.info("Created SQL tabel")
     path = Path(location)
     index = [str(x.absolute()) for x in path.rglob("*") if x.is_file()]
 
     insert_index(connection, index)
     done = datetime.now() - start
-    print(f"Done! Took {done} to crate index with {len(index)} entries")
+    logger.info(f"Done! Took {done} to crate index with {len(index)} entries")
 
 
 if __name__ == '__main__':

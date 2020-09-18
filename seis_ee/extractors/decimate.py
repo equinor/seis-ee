@@ -44,15 +44,15 @@ def decimate_grane(file_dict, nodes):
     os.makedirs(destination, exist_ok=True)
 
     try:
-        print(f"Decimating {file_dict['path']}...")
+        logger.info(f"Decimating {file_dict['path']}...")
         # decimate_process = subprocess.run(args=f"../../decimate -y -confstring '{conf_string}' --ignore-missing {file}",
         decimate_process = subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")
 
-        print(decimate_process.stderr)
+        logger.info(decimate_process.stderr)
     except subprocess.CalledProcessError as e:
-        print(e.stderr)
+        logger.warning(e.stderr)
         raise Exception(e.returncode)
 
 
@@ -72,10 +72,10 @@ def decimate_oseberg(file, nodes):
     except subprocess.CalledProcessError as e:
         raise Exception(e.stderr)
     if decimate_process.stderr:
-        print(decimate_process.stderr)
+        logger.warning(decimate_process.stderr)
         raise ChildProcessError(decimate_process.stderr)
 
-    print(decimate_process.stdout)
+    logger.info(decimate_process.stdout)
 
 
 def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
@@ -104,13 +104,13 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
         with open(file="./error-log.txt", mode='w') as error_file:
             for i in failed_in_some_way:
                 error_file.write(i + "\n")
-        print(f"Wrote error log to {os.getcwd()}/error-log.txt")
+        logger.warning(f"Wrote error log to {os.getcwd()}/error-log.txt")
 
     done = datetime.now() - start
-    print("#######################################")
-    print(
+    logger.info("#######################################")
+    logger.info(
         f"Done! Took {done} to decimate {len(files_to_decimate_file)} files. {len(failed_in_some_way)} failed in some way.")
-    print("#######################################")
+    logger.info("#######################################")
 
 
 if __name__ == '__main__':
