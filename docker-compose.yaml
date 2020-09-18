@@ -9,10 +9,4 @@ services:
     volumes:
       - .:/data
 #       Update this line with your raw data location
-#      - type: bind
-#        source: /project/grane-passive/
-#        target: /raw
-      - /project/grane-passive/:/raw
-#      - /project/grane-passive/G15C_CT4_DY1_drilling/:/raw
-#      - /private/stoo/.ssh:/home/stoo/.ssh
-#    privileged: true
+      - ./test_data/:/raw

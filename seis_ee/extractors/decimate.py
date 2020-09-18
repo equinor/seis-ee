@@ -7,6 +7,7 @@ from enum import Enum
 from typing import Dict, List
 
 from config import Config
+from utils import logger
 
 decimate_result_location = "/data/decimated_files"
 
@@ -20,6 +21,10 @@ def get_files(path: str) -> List[Dict]:
     with open(path) as csvfile:
         reader = csv.DictReader(csvfile)
         return [row for row in reader]
+
+
+def event_as_directory_name(event: str) -> str:
+    return event.replace(" ", "-").replace(":", "-")
 
 
 def get_nodes(path: str):
@@ -37,8 +42,7 @@ def decimate_grane(file_dict, nodes):
     }
     conf_string = json.dumps(conf)
 
-    event_as_friendly_name = file_dict["event"].replace(" ", "-").replace(":", "-")
-    destination = f"{Config.decimated_files_dest}/{event_as_friendly_name}"
+    destination = f"{Config.decimated_files_dest}/{event_as_directory_name(file_dict['event'])}"
 
     # Workaround for bug where Decimate crashes with missing dir
     os.makedirs(destination, exist_ok=True)
@@ -56,26 +60,30 @@ def decimate_grane(file_dict, nodes):
         raise Exception(e.returncode)
 
 
-def decimate_oseberg(file, nodes):
-    raise NotImplemented("Decimate of oseberg files are not implemented")
+def decimate_oseberg(file_dict, nodes):
     conf = {
-        "name": "",
+        "name": "hnet",
         "format": DecimateFormat.SU_OSEBERG.value,
         "description": "30 nodes from oseberg for HNET",
         "included_nodenames": nodes
-
     }
     conf_string = json.dumps(conf)
-    try:
-        decimate_process = subprocess.run(args=f"../../decimate-0.4.0/decimate -y -confstring '{conf_string}' {file}",
-                                          shell=True, check=True, capture_output=True, encoding="UTF-8")
-    except subprocess.CalledProcessError as e:
-        raise Exception(e.stderr)
-    if decimate_process.stderr:
-        logger.warning(decimate_process.stderr)
-        raise ChildProcessError(decimate_process.stderr)
 
-    logger.info(decimate_process.stdout)
+    destination = f"{Config.decimated_files_dest}/{event_as_directory_name(file_dict['event'])}"
+
+    # Workaround for bug where Decimate crashes with missing dir
+    os.makedirs(destination, exist_ok=True)
+
+    try:
+        logger.info(f"Decimating {file_dict['path']}...")
+        decimate_process = subprocess.run(
+            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
+            shell=True, check=True, capture_output=True, encoding="UTF-8")
+
+        logger.info(decimate_process.stderr)
+    except subprocess.CalledProcessError as e:
+        logger.warning(e.stderr)
+        raise Exception(e.returncode)
 
 
 def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
@@ -91,12 +99,13 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
                 decimate_grane(line, nodes_to_keep)
             except Exception as e:
                 failed_in_some_way.append(f"{line['path']};exit_code: {e}")
+
     elif format == DecimateFormat.SU_OSEBERG.value:
         for line in files_to_decimate_file:
             try:
                 decimate_oseberg(line, nodes_to_keep)
             except Exception as e:
-                failed_in_some_way.append(f"{line};exit_code: {e}")
+                failed_in_some_way.append(f"{line['path']};exit_code: {e}")
     else:
         raise NotImplemented(f"Format {format} is not supported")
 
