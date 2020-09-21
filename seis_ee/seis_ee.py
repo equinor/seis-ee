@@ -10,7 +10,8 @@ from utils import logger
 
 
 @click.group()
-@click.option("--log-level", "-l", default="info", type=click.Choice(['info', 'warning', 'error'], case_sensitive=False),
+@click.option("--log-level", "-l", default="info",
+              type=click.Choice(['info', 'warning', 'error'], case_sensitive=False),
               help="Log level. One of 'info', 'warning', 'error'")
 def cli(log_level):
     logger.setLevel(log_level.upper())
@@ -24,15 +25,6 @@ def cli(log_level):
               help=f"How to find the time range covered by the file. Valid formats are {Config.find_files_format}")
 def find_files(target, events, format):
     file_finder(target, events, format)
-
-
-# @cli.command()
-# @click.option("-f", "--file-list", type=str,
-#               help="Path to a file containing files to copy. Every file separated with newline")
-# @click.option("--format", type=click.Choice(["segd-grane", "su-oseberg"], case_sensitive=False),
-#               help="Format of the files to reduce. One of (segd-grane, su-oseberg)")
-# def copy_files(file_list, format):
-#     _copy_files(file_list, format)
 
 
 @cli.command()

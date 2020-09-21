@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from seis_ee.file_finder import find_file
+from find_files.grane import find_file
 
 
 class FindGraneFilesTestCase(unittest.TestCase):

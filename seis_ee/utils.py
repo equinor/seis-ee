@@ -1,4 +1,6 @@
+import csv
 import logging
+import os
 from datetime import datetime
 from functools import wraps
 
@@ -29,3 +31,25 @@ def timeit(f):
         return result
 
     return wrap
+
+
+def load_requested_times(input = f"{os.getcwd()}/requested-times.csv"):
+    time_objects = []
+    with open(input) as csvfile:
+        reader = csv.reader(csvfile, delimiter=" ")
+        for i, row in enumerate(reader):
+            # Skip empty rows
+            if not row:
+                continue
+            r_event = datetime.fromisoformat(row[0])
+            r_from = datetime.fromisoformat(row[1])
+            r_to = datetime.fromisoformat(row[2])
+
+            # Test for invalid range (from larger than to)
+            if r_from >= r_to:
+                logger.warning(f"row {i} is invalid. From date is ending before to date. Skipping...")
+                continue
+            time_objects.append({"event": r_event,
+                                 "from": r_from,
+                                 "to": r_to})
+    return time_objects

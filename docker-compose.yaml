@@ -9,4 +9,5 @@ services:
     volumes:
       - .:/data
 #       Update this line with your raw data location
-      - ./test_data/:/raw
+#      - ./test_data/:/raw
+      - /project:/raw

@@ -6,71 +6,16 @@ from pathlib import Path
 from typing import Dict
 
 from config import Config, FindFilesFormat
-from find_files.filename import grane_path_to_dates
-from find_files.su_header import su_path_to_dates
-from utils import logger, print_help_and_exit
+from find_files.grane import grane_path_to_dates
+from find_files.su_header import day_from_oseberg_path, filter_oseberg_file_on_day_from_path, su_path_to_dates
+from utils import load_requested_times, logger, print_help_and_exit
+from find_files.oseberg import requested_times_to_oseberg_paths
 
 # How long a period each file covers, in seconds
 files_time_slices = 9 - 1
 
 
 # TODO: Optimize: Stop iterating files when the requested time slice has been found.
-
-def find_file(time_range, file) -> Dict:
-    f_start = file["from"]
-    f_end = file["to"]
-    req_start = time_range["from"]
-    req_end = time_range["to"]
-
-    # Check if either start of file, or end of file is inside requested time range
-    if req_start <= f_start <= req_end or req_start <= f_end <= req_end:
-        logger.debug(f"Found file! {file['path']} --- Requested: {req_start} ==> {req_end}")
-        return {"path": str(file["path"].absolute()), "event": str(time_range["event"])}
-
-
-def load_requested_times(input):
-    time_objects = []
-    with open(input) as csvfile:
-        reader = csv.reader(csvfile, delimiter=" ")
-        for i, row in enumerate(reader):
-            # Skip empty rows
-            if not row:
-                continue
-            r_event = datetime.fromisoformat(row[0])
-            r_from = datetime.fromisoformat(row[1])
-            r_to = datetime.fromisoformat(row[2])
-
-            # Test for invalid range (from larger than to)
-            if r_from >= r_to:
-                logger.warning(f"row {i} is invalid. From date is ending before to date. Skipping...")
-                continue
-            time_objects.append({"event": r_event,
-                                 "from": r_from,
-                                 "to": r_to})
-    return time_objects
-
-
-def timerange_of_files(target, requested_times, format):
-    target = Path(target)
-    files = [x for x in target.rglob("*") if x.is_file()]
-
-    if format == FindFilesFormat.FILENAME.value:
-        files_as_dates = [grane_path_to_dates(f) for f in files]
-    elif format == FindFilesFormat.SU_HEADER.value:
-        files_as_dates = [su_path_to_dates(f) for f in files]
-    else:
-        logger.error(f"Invalid format; {format}")
-        print_help_and_exit()
-
-    files_as_dates = [x for x in files_as_dates if x]
-
-    needed_files = []
-    for i in requested_times:
-        for f in files_as_dates:
-            result = find_file(i, f)
-            if result:
-                needed_files.append(result)
-    return needed_files
 
 
 def file_finder(target, requested_times, format):
@@ -91,18 +36,24 @@ def file_finder(target, requested_times, format):
     logger.info(f"Looking for files recursively in {target}. This could take a while...")
 
     requested_times = load_requested_times(requested_times)
-    needed_files = timerange_of_files(target, requested_times, format)
+
+    if format == FindFilesFormat.FILENAME.value:
+        needed_files = needed_files(target, requested_times, format)
+    elif format == FindFilesFormat.SU_HEADER.value:
+        needed_files = requested_times_to_oseberg_paths(requested_times, target)
+
+    found_files = len([p for p in needed_files if p["path"]])
 
     logger.info("############################################")
     logger.info("               Finished!")
     logger.info(f"    Run took {datetime.now() - started} (dd:hh:mm:ss)")
-    logger.info(f"    Found {len(needed_files)} file(s)")
+    logger.info(f"    Found {found_files} file(s)")
     logger.info("############################################")
 
     result_file = f"{os.getcwd()}/{Path(target).stem}-result.csv"
     logger.warning(f"Writing result into {result_file}")
     with open(result_file, "w") as res_file:
-        writer = csv.DictWriter(res_file, fieldnames=["path", "event"])
+        writer = csv.DictWriter(res_file, fieldnames=["path", "file_time", "event"])
         writer.writeheader()
         writer.writerows(needed_files)
 
