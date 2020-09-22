@@ -20,7 +20,7 @@ def cli(log_level):
 
 @cli.command()
 @click.option("--target", "-t", default=os.getcwd(), type=str, help="Location of files to find. Default '.'")
-@click.option("--events", "-e", required=True, type=str, help="CSV-file with time ranges for the events to find.")
+@click.option("--events", "-e", required=True, type=str, help="CSV-file with time ranges for the events to find. Headers (event, from, to). Datetime as ISO 8601")
 @click.option("--format", type=click.Choice(Config.find_files_format, case_sensitive=False), default="filename",
               help=f"How to find the time range covered by the file. Valid formats are {Config.find_files_format}")
 def find_files(target, events, format):
@@ -29,9 +29,9 @@ def find_files(target, events, format):
 
 @cli.command()
 @click.option("-f", "--file-list", type=str,
-              help="Path to a file containing files to reduce. Every file separated with newline")
+              help="Path to a file containing files to reduce. As produced by 'seis_ee.py find-files'")
 @click.option("-s", "--sensor-list", type=str,
-              help="Path to a file containing the sensors to keep. Separated with newline.")
+              help="Path to a CSV-file containing the sensors to keep. Headers (nodeName, nodeNo)")
 @click.option("--format", type=click.Choice(Config.reduce_files_options, case_sensitive=False),
               help=f"Format of the files to reduce. One of {Config.reduce_files_options}")
 def reduce_files(file_list, sensor_list, format):
