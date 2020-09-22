@@ -12,8 +12,10 @@
 /decimated_files/
 /error-log.txt
 /grane-files.txt
-/sensors.txt
+/sensors-grane.csv
 /snorre-results.txt
 /decimate
 /decimated_files.tar.gz
 /requested-times.csv
+/binary
+/header

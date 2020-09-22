@@ -4,8 +4,6 @@ services:
     image: seis-ee
 #    entrypoint: bash
     build: .
-    environment:
-      DECIMATED_FILES_DEST: "/data/decimated_files"
     volumes:
       - .:/data
 #       Update this line with your raw data location

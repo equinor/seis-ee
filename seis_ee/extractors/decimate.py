@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import subprocess
+from pathlib import Path
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List
@@ -20,17 +21,20 @@ class DecimateFormat(Enum):
 def get_files(path: str) -> List[Dict]:
     with open(path) as csvfile:
         reader = csv.DictReader(csvfile)
-        return [row for row in reader]
+        return [row for row in reader if row["path"]]
 
 
 def event_as_directory_name(event: str) -> str:
     return event.replace(" ", "-").replace(":", "-")
 
 
-def get_nodes(path: str):
+def get_nodes(path: str, format):
     with open(path) as csvfile:
         reader = csv.DictReader(csvfile)
-        return [int(row["nodeName"]) for row in reader if row]
+        if format == DecimateFormat.SEGD_GRANE.value:
+            return [int(row["nodeName"]) for row in reader if row]
+        else:
+            return [int(row["nodeNumber"]) for row in reader if row]
 
 
 def decimate_grane(file_dict, nodes):
@@ -74,8 +78,10 @@ def decimate_oseberg(file_dict, nodes):
     # Workaround for bug where Decimate crashes with missing dir
     os.makedirs(destination, exist_ok=True)
 
+    if not Path(file_dict["path"]).exists():
+        raise FileNotFoundError(file_dict["path"])
+
     try:
-        logger.info(f"Decimating {file_dict['path']}...")
         decimate_process = subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")
@@ -90,7 +96,7 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
     start = datetime.now()
 
     files_to_decimate_file = get_files(files_to_decimate_file)
-    nodes_to_keep = get_nodes(sensor_nodes_file)
+    nodes_to_keep = get_nodes(sensor_nodes_file, format)
 
     failed_in_some_way = []
     if format == DecimateFormat.SEGD_GRANE.value:
@@ -104,6 +110,8 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
         for line in files_to_decimate_file:
             try:
                 decimate_oseberg(line, nodes_to_keep)
+            except FileNotFoundError as e:
+                failed_in_some_way.append(f"{line['path']};exit_code: File not found!")
             except Exception as e:
                 failed_in_some_way.append(f"{line['path']};exit_code: {e}")
     else:
@@ -123,12 +131,10 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
 
 
 if __name__ == '__main__':
-    # files_to_decimate = get_files("../test_result.txt")
-    nodes_to_keep = get_nodes("/private/stoo/git/seis-ee/sensors.txt")
 
-    decimate_files("/private/stoo/git/seis-ee/test_data-result.csv", "/private/stoo/git/seis-ee/sensors.txt",
-                   "segd-grane")
+    decimate_files("/test-files.csv", "/private/stoo/git/seis-ee/sensors-oseberg.csv",
+                   "su-oseberg")
 
-    # for f in files_to_decimate:
-    decimate_grane("/private/stoo/git/seis-ee/test_data/grane/full-files/2020-07-24-11-43-47-Grane2128990.sgd",
-                   nodes_to_keep)
+    # # for f in files_to_decimate:
+    # decimate_grane("/private/stoo/git/seis-ee/test_data/grane/full-files/2020-07-24-11-43-47-Grane2128990.sgd",
+    #                nodes_to_keep)
