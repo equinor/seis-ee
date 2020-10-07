@@ -3,13 +3,11 @@ import csv
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
 
 from config import Config, FindFilesFormat
-from find_files.grane import grane_path_to_dates
-from find_files.su_header import day_from_oseberg_path, filter_oseberg_file_on_day_from_path, su_path_to_dates
-from utils import load_requested_times, logger, print_help_and_exit
+from find_files.grane import needed_files
 from find_files.oseberg import requested_times_to_oseberg_paths
+from utils import load_requested_times, logger, print_help_and_exit
 
 # How long a period each file covers, in seconds
 files_time_slices = 9 - 1
@@ -38,7 +36,8 @@ def file_finder(target, requested_times, format):
     requested_times = load_requested_times(requested_times)
 
     if format == FindFilesFormat.FILENAME.value:
-        needed_files = needed_files(target, requested_times, format)
+        from find_files.grane import needed_files
+        needed_files = needed_files(target, requested_times)
     elif format == FindFilesFormat.SU_HEADER.value:
         needed_files = requested_times_to_oseberg_paths(requested_times, target)
 
@@ -59,4 +58,4 @@ def file_finder(target, requested_times, format):
 
 
 if __name__ == '__main__':
-    file_finder("./test_data", "./requested-times.csv", "su-header")
+    file_finder("/test_data", "./requested-times.csv", "filename")

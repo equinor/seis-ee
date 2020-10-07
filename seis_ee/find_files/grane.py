@@ -22,7 +22,7 @@ def grane_path_to_dates(path: Path):
     return {"path": path, "from": first_date, "to": first_date + timedelta(seconds=8)}
 
 
-def needed_files(target, requested_times, format):
+def needed_files(target, requested_times):
     target = Path(target)
 
     files = [x for x in target.rglob("*") if x.is_file()]

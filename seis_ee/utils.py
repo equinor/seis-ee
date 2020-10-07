@@ -15,6 +15,7 @@ console_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 
+
 def print_help_and_exit():
     ctx = click.get_current_context()
     print(ctx.get_help())
@@ -33,10 +34,10 @@ def timeit(f):
     return wrap
 
 
-def load_requested_times(input = f"{os.getcwd()}/requested-times.csv"):
+def load_requested_times(input=f"{os.getcwd()}/requested-times.csv"):
     time_objects = []
     with open(input) as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=" ")
+        reader = csv.DictReader(csvfile)
         for i, row in enumerate(reader):
             # Skip empty rows
             if not row:

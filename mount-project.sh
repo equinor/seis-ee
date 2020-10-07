@@ -1,14 +1,10 @@
 #! /usr/bin/env bash
 
-#fusermount -zu /project/grane-passive
-#fusermount -zu /project/snorre-passive
-fusermount -zu /project
-#fusermount -zu /project/snorre-passive
+sudo fusermount -zu /project
 
-#mkdir -p /project/grane-passive
-#mkdir -p /project/snorre-passive
 mkdir -p /project
 
-#sudo sshfs -o allow_other stoo@st-linrgsn239.st.statoil.no:/project/grane-passive /project/grane-passive
-#sudo sshfs -o allow_other stoo@st-linrgsn239.st.statoil.no:/project/snorre-passive /project/snorre-passive
+# Here you can find Grane and Snorre
+#sudo sshfs -o allow_other stoo@st-linrgsn239.st.statoil.no:/project /project
+# Here Oseberg is available
 sudo sshfs -o allow_other stoo@be-linrgsn154.be.statoil.no:/project /project

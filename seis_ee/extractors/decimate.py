@@ -53,7 +53,6 @@ def decimate_grane(file_dict, nodes):
 
     try:
         logger.info(f"Decimating {file_dict['path']}...")
-        # decimate_process = subprocess.run(args=f"../../decimate -y -confstring '{conf_string}' --ignore-missing {file}",
         decimate_process = subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")
@@ -61,7 +60,7 @@ def decimate_grane(file_dict, nodes):
         logger.info(decimate_process.stderr)
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
-        raise Exception(e.returncode)
+        raise Exception(e.stderr)
 
 
 def decimate_oseberg(file_dict, nodes):
@@ -104,16 +103,16 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
             try:
                 decimate_grane(line, nodes_to_keep)
             except Exception as e:
-                failed_in_some_way.append(f"{line['path']};exit_code: {e}")
+                failed_in_some_way.append(f"{line['path']};exit_code: {str(e)}")
 
     elif format == DecimateFormat.SU_OSEBERG.value:
         for line in files_to_decimate_file:
             try:
                 decimate_oseberg(line, nodes_to_keep)
-            except FileNotFoundError as e:
+            except FileNotFoundError:
                 failed_in_some_way.append(f"{line['path']};exit_code: File not found!")
             except Exception as e:
-                failed_in_some_way.append(f"{line['path']};exit_code: {e}")
+                failed_in_some_way.append(f"{line['path']};exit_code: {str(e)}")
     else:
         raise NotImplemented(f"Format {format} is not supported")
 

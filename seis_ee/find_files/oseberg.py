@@ -32,14 +32,18 @@ def zero_or_one_day(target: Path) -> bool:
     raise ValueError(f"No day folder exists for {target}")
 
 
-def _find_file(first_file: Path, requested_time: datetime) -> Path:
+def _find_file(first_file: Path, requested_time: datetime, search_path):
     found_file = first_file
     file_time = timerange_of_su_file(str(found_file))
     counter = 0
 
     while not requested_time == file_time:
-        # while not requested_time + timedelta(seconds=9) >= file_time >= requested_time - timedelta(seconds=9):
         time_delta = requested_time - file_time
+        # Files can be placed in wrong folder. Try getting new path with day offset:
+        if time_delta > timedelta(days=1):
+            new_day_folder = _datetime_to_oseberg_path(requested_time, search_path, 1)
+            new_first_file = _find_first_file_in_folder(new_day_folder)
+            return _find_file(new_first_file, requested_time, search_path)
         offset = int((time_delta.total_seconds() / 10))
         file_stem = str(int(found_file.stem) + offset)
         found_file = Path(found_file.parent, f"{file_stem}.su")
@@ -50,6 +54,10 @@ def _find_file(first_file: Path, requested_time: datetime) -> Path:
         file_time = timerange_of_su_file(str(found_file))
         counter += 1
         if counter > 10:
+            # Could not find a file with exact time match. Will use best match. (Timedelta < 10sec)
+            if offset == 0:
+                logger.warning(f"Not exact match. Requested: {requested_time} File-time: {file_time}. Using this...")
+                return found_file, file_time
             logger.warning(f"Missing file {found_file}...Skipping")
             return None, None
 
@@ -57,27 +65,37 @@ def _find_file(first_file: Path, requested_time: datetime) -> Path:
     return found_file, file_time
 
 
-def datetime_to_oseberg_path(time: datetime, target: Path) -> str:
-    """
-    The folder structure is static, and the first file in every folder starts at midnight.
-    We find name of the first file, calculate requested offset, and find path with requested times.
-    """
+def _datetime_to_oseberg_path(time, prefix, day_offset=0) -> Path:
     month = f"OsebergC-SWIM_{zero_pad_day(time.month)}/su_files"
-    day = f"Passive_{str(time.year)}{zero_pad_day(time.month)}{zero_pad_day(time.day)}"
+    day = f"Passive_{str(time.year)}{zero_pad_day(time.month)}{zero_pad_day(time.day + day_offset)}"
 
     # The day folder can end with ether 0 or 1, with no way to know
-    if zero_or_one_day(Path(target, month, day)):
+    if zero_or_one_day(Path(prefix, month, day)):
         day = day + "_000001"
     else:
         day = day + "_000000"
 
-    path_to_start = Path(target, month, day)
-    files = path_to_start.rglob("*")
+    path_to_start = Path(prefix, month, day)
+    return path_to_start
+
+
+def _find_first_file_in_folder(folder: Path) ->Path:
+    files = folder.rglob("*")
     t = [str(f) for f in files if f.suffix == ".su"]
     t.sort()
-    first_file = Path(t[0]).stem
+    first_file = Path(t[0])
+    return first_file
 
-    req_file, file_time = _find_file(Path(t[0]), time)
+
+def datetime_to_oseberg_path(time: datetime, target: Path):
+    """
+    The folder structure is static, and the first file in every folder starts at midnight (NOT CORRECT).
+    We find name of the first file, calculate requested offset, and find path with requested times.
+    """
+    path_to_start = _datetime_to_oseberg_path(time, target)
+    first_file = _find_first_file_in_folder(path_to_start)
+
+    req_file, file_time = _find_file(Path(first_file), time, target)
 
     return req_file, file_time
 
@@ -115,7 +133,5 @@ def requested_times_to_oseberg_paths(requested_times, target) -> [Path]:
 
 
 if __name__ == '__main__':
-    times = load_requested_times()
-    time_chunks = requested_times_to_oseberg_chunks(times)
-    paths = requested_times_to_oseberg_paths(time_chunks, "/project")
-    print(123)
+    times = load_requested_times("requested-times-pri.csv")
+    paths = requested_times_to_oseberg_paths(times, "/project")

@@ -9,7 +9,7 @@
 /test_data/
 /decimate-0.4.0/
 /segdpy/
-/decimated_files/
+/decimated_files*
 /error-log.txt
 /grane-files.txt
 /sensors-grane.csv
