@@ -33,28 +33,30 @@ def file_finder(target, requested_times, format):
     logger.info(f"Looking for files recursively in {target}. This could take a while...")
 
     requested_times = load_requested_times(requested_times)
-
+    number_missing_events, number_found_files = 0, 0
     if format == FindFilesFormat.FILENAME.value:
         from find_files.grane import needed_files
-        needed_files = needed_files(target, requested_times)
+        needed_files, number_found_files, number_missing_events = needed_files(target, requested_times)
     elif format == FindFilesFormat.SU_HEADER.value:
-        needed_files = requested_times_to_oseberg_paths(requested_times, target)
-
-    found_files = len([p for p in needed_files if p["path"]])
+        needed_files, number_found_files = requested_times_to_oseberg_paths(requested_times, target)
 
     logger.info("############################################")
     logger.info("               Finished!")
     logger.info(f"    Run took {datetime.now() - started} (dd:hh:mm:ss)")
-    logger.info(f"    Found {found_files} file(s)")
+    logger.info(f"    Found {number_found_files} file(s)")
     logger.info("############################################")
+
+    if number_missing_events > 0:
+        logger.info(f"    A total of {number_missing_events} event(s) not found in any files.")
+        logger.info("############################################")
 
     result_file = f"{os.getcwd()}/{Path(target).stem}-result.csv"
     logger.warning(f"Writing result into {result_file}")
     with open(result_file, "w") as res_file:
-        writer = csv.DictWriter(res_file, fieldnames=["path", "file_time", "event"])
+        writer = csv.DictWriter(res_file, fieldnames=["event", "file_time", "path"])
         writer.writeheader()
         writer.writerows(needed_files)
 
 
 if __name__ == '__main__':
-    file_finder("./test_data", "./requested-times-pri.csv", "filename")
+    file_finder("/project/grane-passive/", "./requested-times-pri.csv", "filename")
