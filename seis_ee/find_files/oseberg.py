@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from find_files.su_header import timerange_of_su_file
+from readers.su_header import timerange_of_su_file
 from utils import load_requested_times, logger
 
 

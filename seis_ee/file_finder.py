@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 
 from config import Config, FindFilesFormat
-from find_files.grane import needed_files
 from find_files.oseberg import requested_times_to_oseberg_paths
 from utils import load_requested_times, logger, print_help_and_exit
 

@@ -109,3 +109,6 @@ Decimating about 390 files with a 10 sec time span each from oseberg took about 
 
 - [ ] Support snorre type SensorTypes (decimate)
 - [ ] Investigate missing files. Bad transfer offshore?
+- [x] Decimate segd files with different number of samples
+- [x] Create overview of found/missing/failed data
+- [ ] Perf: Don't decimate already decimated files (overlapping times, different events)

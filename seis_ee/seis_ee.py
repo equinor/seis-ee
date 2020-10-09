@@ -4,7 +4,7 @@ import os
 import click
 
 from config import Config
-from extractors.decimate import decimate_files
+from decimate import decimate_files
 from file_finder import file_finder
 from utils import logger
 

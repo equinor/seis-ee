@@ -8,7 +8,7 @@ from enum import Enum
 from typing import Dict, List
 
 from config import Config
-from extractors.segd import number_of_samples_in_segd_file
+from readers.segd import number_of_samples_in_segd_file
 from utils import logger
 
 decimate_result_location = "/data/decimated_files"
@@ -114,8 +114,10 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
             try:
                 decimate_oseberg(line, nodes_to_keep)
             except FileNotFoundError:
+                logger.warning(f"{line['path']};exit_code: File not found!")
                 failed_in_some_way.append(f"{line['path']};exit_code: File not found!")
             except Exception as e:
+                logger.warning(f"{line['path']};exit_code: {str(e)}")
                 failed_in_some_way.append(f"{line['path']};exit_code: {str(e)}")
     else:
         raise NotImplemented(f"Format {format} is not supported")
@@ -135,7 +137,7 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
 
 if __name__ == '__main__':
 
-    decimate_files("/test-files.csv", "/private/stoo/git/seis-ee/sensors-oseberg.csv",
+    decimate_files("/test-files.csv", "/sensors-oseberg.csv",
                    "su-oseberg")
 
     # # for f in files_to_decimate:
