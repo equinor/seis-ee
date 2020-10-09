@@ -26,6 +26,8 @@ def needed_files(target, requested_times):
     target = Path(target)
 
     files = [x for x in target.rglob("*") if x.is_file()]
+    # Filter out already decimated files
+    files = [x for x in files if not x.name.endswith("_dec.sgd")]
     files_as_dates = [grane_path_to_dates(f) for f in files]
 
     files_as_dates = [x for x in files_as_dates if x]

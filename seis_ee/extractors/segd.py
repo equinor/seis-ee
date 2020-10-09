@@ -1,10 +1,10 @@
 from segdpy import segdpy
 
 
-def main(filename):
-    data, rec_info, chan_sets, trc_hdrs, fem = segdpy.read_segd_file(filename)
-    print(123)
+def number_of_samples_in_segd_file(file_path: str) -> int:
+    segdfile = segdpy.SegDFile(file_path)
+    return segdfile.segdrecord.samples_per_trace
 
 
 if __name__ == '__main__':
-    main("../../test_data/grane/full-files/segd-test.sgd")
+    number_of_samples_in_segd_file("../../test_data/grane/full-files/segd-test.sgd")

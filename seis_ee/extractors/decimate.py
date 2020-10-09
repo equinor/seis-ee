@@ -8,6 +8,7 @@ from enum import Enum
 from typing import Dict, List
 
 from config import Config
+from extractors.segd import number_of_samples_in_segd_file
 from utils import logger
 
 decimate_result_location = "/data/decimated_files"
@@ -38,11 +39,13 @@ def get_nodes(path: str, format):
 
 
 def decimate_grane(file_dict, nodes):
+    samples = number_of_samples_in_segd_file(file_dict["path"])
     conf = {
         "name": "hnet",
         "format": DecimateFormat.SEGD_GRANE.value,
         "description": "30 nodes from grane for HNET",
-        "included_nodenames": nodes
+        "included_nodenames": nodes,
+        "samples": samples
     }
     conf_string = json.dumps(conf)
 
@@ -53,6 +56,7 @@ def decimate_grane(file_dict, nodes):
 
     try:
         logger.info(f"Decimating {file_dict['path']}...")
+        logger.info(f"Samples per trace: {samples}")
         decimate_process = subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")

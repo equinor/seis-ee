@@ -58,4 +58,4 @@ def file_finder(target, requested_times, format):
 
 
 if __name__ == '__main__':
-    file_finder("/test_data", "./requested-times.csv", "filename")
+    file_finder("./test_data", "./requested-times-pri.csv", "filename")

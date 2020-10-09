@@ -58,6 +58,7 @@ Options:
 ## Notable Dependencies
  - Decimate - Used to extract given traces from segd files - https://git.equinor.com/sentry/decimate
  - Segyio - Used for reading su-files headers - https://github.com/equinor/segyio
+ - Segdpy - Reading of metadata from segd files - https://github.com/equinor/segdpy
 
 
 ## How-to extract data
