@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import List
 
 from readers.su_header import timerange_of_su_file
 from utils import load_requested_times, logger
@@ -66,6 +67,7 @@ def _find_file(first_file: Path, requested_time: datetime, search_path):
 
 
 def _datetime_to_oseberg_path(time, prefix, day_offset=0) -> Path:
+    # Takes a DateTime object, and return a Path to where the Oseberg su-file should be
     month = f"OsebergC-SWIM_{zero_pad_day(time.month)}/su_files"
     day = f"Passive_{str(time.year)}{zero_pad_day(time.month)}{zero_pad_day(time.day + day_offset)}"
 
@@ -132,6 +134,13 @@ def requested_times_to_oseberg_paths(requested_times, target) -> [Path]:
     return paths, len(paths)
 
 
+def files_in_todays_directory() -> List[Path]:
+    date = datetime.now()
+    path = _datetime_to_oseberg_path(date, "/home/stig/git/seis-ee/test_data")
+    print(path)
+    target = Path(path)
+    files = [x for x in target.rglob("*") if x.is_file()]
+    return files
+
 if __name__ == '__main__':
-    times = load_requested_times("requested-times-pri.csv")
-    paths = requested_times_to_oseberg_paths(times, "/project")
+    files_in_todays_directory()
