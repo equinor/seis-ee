@@ -18,6 +18,7 @@ def transfer_file(target: str):
     _dest = target.split("/")[-3:]
     dest = f"{Config.stream_server_dir}/{'/'.join(_dest)}"
     ensure_remote_path(str(Path(dest).parent))
+    logger.info(f"Transfering '{target}' to '{Config.stream_server_user}@{Config.stream_server_host}:{dest}'")
     try:
         subprocess.run(
             args=f"rsync -vA {target} {Config.stream_server_user}@{Config.stream_server_host}:{dest}",

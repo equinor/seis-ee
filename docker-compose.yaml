@@ -9,6 +9,6 @@ services:
 #       Update this line with your raw data location
       - ./test_data/OsebergC-SWIM_01:/raw/oseberg/OsebergC-SWIM_01
       - ./test_data/oseberg_sensors.csv:/raw/oseberg_sensors.csv
-      - ./ssh:/root/.ssh
+      - ./ssh:/home/seis/.ssh
 
-    command: stream-files
+    entrypoint: python3 /app/seis_ee.py
