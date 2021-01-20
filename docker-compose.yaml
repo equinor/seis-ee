@@ -5,7 +5,9 @@ services:
 #    entrypoint: bash
     build: .
     volumes:
-      - .:/data
+      - ./data:/data
 #       Update this line with your raw data location
-#      - ./test_data/:/raw
-      - /project/grane-passive:/raw
+      - ./test_data/OsebergC-SWIM_01:/raw/oseberg/OsebergC-SWIM_01
+      - ./test_data/oseberg_sensors.csv:/raw/oseberg_sensors.csv
+
+    command: stream-files

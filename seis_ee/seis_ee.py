@@ -6,6 +6,7 @@ import click
 from config import Config
 from decimate import decimate_files
 from file_finder import file_finder
+from streamer import main
 from utils import logger
 
 
@@ -36,6 +37,17 @@ def find_files(target, events, format):
               help=f"Format of the files to reduce. One of {Config.reduce_files_options}")
 def reduce_files(file_list, sensor_list, format):
     decimate_files(file_list, sensor_list, format)
+
+
+@cli.command()
+@click.option("-t", "--target", type=str,
+              help="Target destination to stream new files from")
+@click.option("-s", "--sensor-list", type=str,
+              help="Path to a CSV-file containing the sensors to keep. Headers (nodeName, nodeNo)")
+@click.option("--format", type=click.Choice(Config.reduce_files_options, case_sensitive=False),
+              help=f"Format of the files to reduce. One of {Config.reduce_files_options}")
+def stream_files(target, sensor_list, format):
+    main(target, sensor_list, format)
 
 
 if __name__ == '__main__':

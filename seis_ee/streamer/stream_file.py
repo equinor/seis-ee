@@ -1,3 +1,10 @@
+import os
+from typing import List
+
+from decimate import decimate_oseberg
+from find_files.oseberg import oseberg_path_to_date
+
+
 class StreamFile:
     def __init__(self, path: str, database, decimated: bool = False, transferred: bool = False, decimated_path: str = None):
         self.path = path
@@ -6,12 +13,13 @@ class StreamFile:
         self.decimated_path = decimated_path
         self.database = database
 
-    def decimate(self):
+    def decimate(self, nodes: List[int]):
         # TODO: Decimate
+        date = oseberg_path_to_date(self.path)
+        self.decimated_path = f"{os.getcwd()}/decimated_files/{date.year}/{date.month}"
+        decimate_oseberg(self.path, nodes, destination=self.decimated_path)
         self.decimated = True
-        self.decimated_path = "qwerty"
         self.database.update(self)
-        # raise NotImplemented
 
     def transfer(self):
         # TODO: Transfer

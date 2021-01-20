@@ -2,13 +2,13 @@ import csv
 import json
 import os
 import subprocess
-from pathlib import Path
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Dict, List
 
 from config import Config
-from readers.segd import number_of_samples_in_segd_file
+# from readers.segd import number_of_samples_in_segd_file
 from utils import logger
 
 decimate_result_location = "/data/decimated_files"
@@ -38,36 +38,36 @@ def get_nodes(path: str, format):
             return [int(row["nodeNumber"]) for row in reader if row]
 
 
-def decimate_grane(file_dict, nodes):
-    samples = number_of_samples_in_segd_file(file_dict["path"])
-    conf = {
-        "name": "hnet",
-        "format": DecimateFormat.SEGD_GRANE.value,
-        "description": "30 nodes from grane for HNET",
-        "included_nodenames": nodes,
-        "samples": samples
-    }
-    conf_string = json.dumps(conf)
+# def decimate_grane(file_dict, nodes):
+#     samples = number_of_samples_in_segd_file(file_dict["path"])
+#     conf = {
+#         "name": "hnet",
+#         "format": DecimateFormat.SEGD_GRANE.value,
+#         "description": "30 nodes from grane for HNET",
+#         "included_nodenames": nodes,
+#         "samples": samples
+#     }
+#     conf_string = json.dumps(conf)
+#
+#     destination = f"{Config.decimated_files_dest}/{event_as_directory_name(file_dict['event'])}"
+#
+#     # Workaround for bug where Decimate crashes with missing dir
+#     os.makedirs(destination, exist_ok=True)
+#
+#     try:
+#         logger.info(f"Decimating {file_dict['path']}...")
+#         logger.info(f"Samples per trace: {samples}")
+#         decimate_process = subprocess.run(
+#             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
+#             shell=True, check=True, capture_output=True, encoding="UTF-8")
+#
+#         logger.info(decimate_process.stderr)
+#     except subprocess.CalledProcessError as e:
+#         logger.warning(e.stderr)
+#         raise Exception(e.stderr)
 
-    destination = f"{Config.decimated_files_dest}/{event_as_directory_name(file_dict['event'])}"
 
-    # Workaround for bug where Decimate crashes with missing dir
-    os.makedirs(destination, exist_ok=True)
-
-    try:
-        logger.info(f"Decimating {file_dict['path']}...")
-        logger.info(f"Samples per trace: {samples}")
-        decimate_process = subprocess.run(
-            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
-            shell=True, check=True, capture_output=True, encoding="UTF-8")
-
-        logger.info(decimate_process.stderr)
-    except subprocess.CalledProcessError as e:
-        logger.warning(e.stderr)
-        raise Exception(e.stderr)
-
-
-def decimate_oseberg(file_dict, nodes):
+def decimate_oseberg_old(file_dict, nodes):
     conf = {
         "name": "hnet",
         "format": DecimateFormat.SU_OSEBERG.value,
@@ -88,6 +88,32 @@ def decimate_oseberg(file_dict, nodes):
         decimate_process = subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
             shell=True, check=True, capture_output=True, encoding="UTF-8")
+
+        logger.info(decimate_process.stderr)
+    except subprocess.CalledProcessError as e:
+        logger.warning(e.stderr)
+        raise Exception(e.returncode)
+
+
+def decimate_oseberg(file_path: str, nodes: List[int], destination: str = "./"):
+    conf = {
+        "name": "ccs",
+        "format": DecimateFormat.SU_OSEBERG.value,
+        "description": "30 nodes from oseberg for CCS",
+        "included_nodenames": nodes
+    }
+    conf_string = json.dumps(conf)
+
+    # Workaround for bug where Decimate crashes with missing dir
+    os.makedirs(destination, exist_ok=True)
+
+    if not Path(file_path).exists():
+        raise FileNotFoundError(file_path)
+
+    try:
+        decimate_process = subprocess.run(
+            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_path}",
+            shell=True, check=True, encoding="UTF-8")
 
         logger.info(decimate_process.stderr)
     except subprocess.CalledProcessError as e:
@@ -136,7 +162,6 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
 
 
 if __name__ == '__main__':
-
     decimate_files("/test-files.csv", "/sensors-oseberg.csv",
                    "su-oseberg")
 

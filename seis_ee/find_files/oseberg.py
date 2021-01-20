@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List
 
 from readers.su_header import timerange_of_su_file
-from utils import load_requested_times, logger
+from utils import logger
 
 
 def zero_pad_day(day: int) -> str:
@@ -71,7 +71,7 @@ def _datetime_to_oseberg_path(time, prefix, day_offset=0) -> Path:
     month = f"OsebergC-SWIM_{zero_pad_day(time.month)}/su_files"
     day = f"Passive_{str(time.year)}{zero_pad_day(time.month)}{zero_pad_day(time.day + day_offset)}"
 
-    # The day folder can end with ether 0 or 1, with no way to know
+    # The day folder can end with ether 0 or 1, with no way of knowing
     if zero_or_one_day(Path(prefix, month, day)):
         day = day + "_000001"
     else:
@@ -81,7 +81,7 @@ def _datetime_to_oseberg_path(time, prefix, day_offset=0) -> Path:
     return path_to_start
 
 
-def _find_first_file_in_folder(folder: Path) ->Path:
+def _find_first_file_in_folder(folder: Path) -> Path:
     files = folder.rglob("*")
     t = [str(f) for f in files if f.suffix == ".su"]
     t.sort()
@@ -100,6 +100,16 @@ def datetime_to_oseberg_path(time: datetime, target: Path):
     req_file, file_time = _find_file(Path(first_file), time, target)
 
     return req_file, file_time
+
+
+def oseberg_path_to_date(path: str) -> datetime:
+    parts = path.split("/")
+    start_index = [i for i, part in enumerate(parts) if 'OsebergC-SWIM' in part][0]
+    month = int(parts[start_index].split("_")[1])
+    dategroup = parts[start_index + 2].split("_")[1]
+    year = int(dategroup[:4])
+    day = int(dategroup[6:8])
+    return datetime(year=year, month=month, day=day)
 
 
 def round_to_10_sec_range(time: datetime) -> datetime:
@@ -142,5 +152,7 @@ def files_in_todays_directory() -> List[Path]:
     files = [x for x in target.rglob("*") if x.is_file()]
     return files
 
+
 if __name__ == '__main__':
-    files_in_todays_directory()
+    oseberg_path_to_date(
+        "/test_data/OsebergC-SWIM_01/su_files/Passive_20210120_000001/production/2.su")
