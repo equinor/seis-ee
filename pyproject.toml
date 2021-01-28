@@ -11,6 +11,7 @@ click = "^7.1.2"
 segyio = "^1.9.1"
 numpy = "^1.19.1"
 pandas = "^1.1.1"
+inotify = "^0.2.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"

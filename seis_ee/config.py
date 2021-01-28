@@ -14,3 +14,8 @@ class Config:
 class FindFilesFormat(Enum):
     FILENAME = "filename"
     SU_HEADER = "su-header"
+
+
+class InotifyEvents(Enum):
+    IN_CREATE = "IN_CREATE"
+
