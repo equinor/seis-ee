@@ -13,7 +13,7 @@ from config import InotifyEvents
 
 def files_in_todays_directory(target_dir: str) -> Set[str]:
     date = datetime.now()
-    path = _datetime_to_oseberg_path(date, target_dir)   #this is data\OsebergC-SWIM_01\su_files\Passive_20210127_000001\
+    path = _datetime_to_oseberg_path(date, target_dir)
     # path = _datetime_to_oseberg_path(date, "/home/stig/git/seis-ee/test_data")
     target = Path(path)
     files = [str(x.resolve()) for x in target.rglob("*") if x.is_file()]
@@ -59,7 +59,7 @@ def main(target_dir, sensor_list, format):
     # Complete any unfinished file transfers that was started on a previous run
     continue_unfinished(sensors)
 
-    # On first loop, load existing files from database - will store the path of each .su file in a set.
+    # On first loop, load existing files from database
     processed: Set = set(database.select_all_paths())
     print("Looking for new files...")
     new_files: Set = files_in_todays_directory(target_dir).difference(processed)
