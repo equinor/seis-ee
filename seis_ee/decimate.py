@@ -110,6 +110,7 @@ def decimate_oseberg(file_path: str, nodes: List[int], destination: str = "./"):
     if not Path(file_path).exists():
         raise FileNotFoundError(file_path)
 
+    '''
     try:
         subprocess.run(
             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_path}",
@@ -118,7 +119,7 @@ def decimate_oseberg(file_path: str, nodes: List[int], destination: str = "./"):
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
         raise e
-
+    '''
 
 def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
     start = datetime.now()

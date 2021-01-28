@@ -1,5 +1,5 @@
 FROM registry.git.equinor.com/sentry/decimate:latest
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=0 
 
 RUN useradd  --uid 1000 --user-group seis
 

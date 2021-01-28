@@ -11,4 +11,4 @@ services:
       - ./test_data/oseberg_sensors.csv:/raw/oseberg_sensors.csv
       - ./ssh:/home/seis/.ssh
 
-    entrypoint: python3 /app/seis_ee.py
+    entrypoint: python3 /app/test.py
