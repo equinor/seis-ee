@@ -3,7 +3,7 @@ import os
 
 import click
 
-from config import Config
+from config import Config, FileDetectionTypes
 from decimate import decimate_files
 from file_finder import file_finder
 from streamer import main
@@ -46,9 +46,9 @@ def reduce_files(file_list, sensor_list, format):
               help="Path to a CSV-file containing the sensors to keep. Headers (nodeName, nodeNo)")
 @click.option("--format", type=click.Choice(Config.reduce_files_options, case_sensitive=False),
               help=f"Format of the files to reduce. One of {Config.reduce_files_options}")
-def stream_files(target, sensor_list, format):
-    main(target, sensor_list, format)
-
+@click.option("--file-detection", type=click.Choice(Config.detection_types, case_sensitive=False), help="Use either inotify or regular python code for detecting new files")
+def stream_files(target, sensor_list, format, file_detection):
+    main(target, sensor_list, format, file_detection)
 
 if __name__ == '__main__':
     cli()
