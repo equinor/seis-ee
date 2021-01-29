@@ -17,7 +17,6 @@ def files_in_todays_directory(target_dir: str) -> Set[str]:
     # path = _datetime_to_oseberg_path(date, "/home/stig/git/seis-ee/test_data")
     target = Path(path)
     files = [str(x.resolve()) for x in target.rglob("*") if x.is_file()]
-
     return set(files)
 
 
@@ -71,9 +70,12 @@ def main(target_dir, sensor_list, format):
 
     # create an Inotify watcher to detect changes in target directory
     watcher = inotify.adapters.Inotify()
-    watcher.add_watch(target_dir)
 
-    #add functionality for watching tree of folders instead of only one folder
+    date = datetime.now()
+    todays_path = str(_datetime_to_oseberg_path(date, target_dir))
+    watcher.add_watch(todays_path)
+
+    # add functionality for watching tree of folders instead of only one folder
     watcher = inotify.adapters.InotifyTree(target_dir)
 
     # check if events in target directory occur
@@ -87,9 +89,8 @@ def main(target_dir, sensor_list, format):
             if (len(new_files) > 0):
                 processed = transfer_new_files(new_files, database, sensors, processed)
 
-
-
     '''
+    minimum_time_loop = timedelta(seconds=30)
     # Loop indefinitely, streaming any new files
     while True:
         start = datetime.now()

@@ -9,8 +9,8 @@ class DecimateFormat(Enum):
     SU_OSEBERG = "su-oseberg"
 
 if __name__ == '__main__':
-    target_path: str = "/data"
-    sensor_list_path: str = "/data/nodes.csv"
+    target_path: str = "/data"                  #local folder where you put test data
+    sensor_list_path: str = "/data/nodes.csv"   #file where sensor nodes are defined
     format: str = "su-oseberg"  #"segd-grane"
 
     main(target_path, sensor_list_path, format)
