@@ -1,3 +1,4 @@
+import inotify.adapters
 from datetime import datetime, timedelta
 from pathlib import Path
 from time import sleep
@@ -7,6 +8,7 @@ from decimate import get_nodes
 from find_files.oseberg import _datetime_to_oseberg_path
 from streamer.db_service import Database
 from streamer.stream_file import StreamFile
+from config import InotifyEvents, FileDetectionTypes
 
 
 def files_in_todays_directory(target_dir: str) -> Set[str]:
@@ -32,11 +34,20 @@ def continue_unfinished(sensors: List[int]):
     for file in unfinished:
         work_file(file, sensors)
 
+def transfer_new_files(new_files: Set, database: Database, sensors: [], processed: Set):
+    # the parameter set new_files contains path for the new files to stream
+    for path in new_files:
+        file = StreamFile(path, database)
+        file.insert()
+        work_file(file, sensors)
+    processed.update(new_files)
+    print(f"Transferred {len(new_files)}")
+    return processed
 
 # {
 #   "path": { "decimated": bool, "decimated_path": "path/to/decimated/file", "transferred": bool }
 # }
-def main(target_dir, sensor_list, format):
+def main(target_dir, sensor_list, format, file_detection_type):
     database = Database()
     # Delete all records older than x(2) days, as they are not relevant
     database.delete_old_rows()
@@ -53,27 +64,45 @@ def main(target_dir, sensor_list, format):
     new_files: Set = files_in_todays_directory(target_dir).difference(processed)
     print(f"Found {len(new_files)} new files")
 
-    minimum_time_loop = timedelta(seconds=30)
+    if (file_detection_type == FileDetectionTypes.REGULAR.value):
+        minimum_time_loop = timedelta(seconds=30)
+        # Loop indefinitely, streaming any new files
+        while True:
+            start = datetime.now()
+            processed = transfer_new_files(new_files, database, sensors, processed)
 
-    # Loop indefinitely, streaming any new files
-    while True:
-        start = datetime.now()
-        for path in new_files:
-            file = StreamFile(path, database)
-            file.insert()
-            work_file(file, sensors)
+            # If loop took shorter than x(2)min, wait till x minutes has passed
+            elapsed = datetime.now() - start
+            if elapsed < minimum_time_loop:
+                sleep((minimum_time_loop - elapsed).seconds)
 
-        processed.update(new_files)
-        print(f"Transferred {len(new_files)}")
+            print("Looking for new files...")
+            new_files: Set = files_in_todays_directory(target_dir).difference(processed)
+            print(f"Found {len(new_files)} new files")
+    elif (file_detection_type == FileDetectionTypes.INOTIFY.value):
+        # stream new files not already in database
+        if (len(new_files) > 0):
+            processed = transfer_new_files(new_files, database, sensors, processed)
 
-        # If loop took shorter than x(2)min, wait till x minutes has passed
-        elapsed = datetime.now() - start
-        if elapsed < minimum_time_loop:
-            sleep((minimum_time_loop - elapsed).seconds)
+        # create an Inotify watcher to detect changes in target directory
+        watcher = inotify.adapters.Inotify()
+        watcher.add_watch(target_dir)
 
-        print("Looking for new files...")
-        new_files: Set = files_in_todays_directory(target_dir).difference(processed)
-        print(f"Found {len(new_files)} new files")
+        # add functionality for watching tree of folders instead of only one folder
+        watcher = inotify.adapters.InotifyTree(target_dir)
+
+        # check if events in target directory occur
+        for event in watcher.event_gen(yield_nones=False):
+            (_, event_type_names, path, filename) = event
+            filepath: str = f"{path}/{filename}"
+
+            # Transfer file if new file is created
+            if (InotifyEvents.IN_CREATE.value in event_type_names and Path(filepath).is_file()):
+                file = StreamFile(filepath, database)
+                file.insert()
+                work_file(file, sensors)
+                print("Transferred file")
+
 
 
 if __name__ == '__main__':
