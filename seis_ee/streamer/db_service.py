@@ -9,15 +9,16 @@ from streamer.stream_file import StreamFile
 class Database:
     DB_TABLE = "stream_files"
 
-    def __init__(self):
+    def __init__(self, format):
         try:
-            self.connection = sqlite3.connect(f"{os.getcwd()}/sqlite.db")
+            self.connection = sqlite3.connect(f"{os.getcwd()}/{format}-sqlite.db")
             cursor = self.connection.cursor()
             sql_create_table = f""" CREATE TABLE IF NOT EXISTS {self.DB_TABLE} (
                                                         path text PRIMARY KEY,
                                                         decimated BOOLEAN,
                                                         transferred BOOLEAN,
                                                         decimated_path text,
+                                                        file_type text,
                                                         file_date text
                                                     ); """
             cursor.execute(sql_create_table)
@@ -26,8 +27,8 @@ class Database:
 
     def insert(self, file: StreamFile):
         print(f"Inserting '{file.path}'")
-        query = f""" INSERT INTO {self.DB_TABLE} (path, decimated, transferred, decimated_path, file_date)
-                    VALUES(?,?,?,?,datetime('now')); """
+        query = f""" INSERT INTO {self.DB_TABLE} (path, decimated, transferred, decimated_path, file_type, file_date)
+                    VALUES(?,?,?,?,?,datetime('now')); """
 
         cursor = self.connection.cursor()
         cursor.execute(query, file.to_tuple())

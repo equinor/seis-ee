@@ -5,6 +5,13 @@ from typing import Dict
 
 from utils import logger
 
+def grane_path_to_date(path: str) -> datetime:
+    #assume grane file name is on the format: 2019-10-26-07-43-59-Grane1035406.sgd
+    parts = path.split("/")
+    filename = parts[-1]
+    filename_parts = filename.split("-")
+    year, month, day = filename_parts[0], filename_parts[1], filename_parts[2]
+    return datetime(year=int(year), month=int(month), day=int(day))
 
 def grane_path_to_dates(path: Path):
     # Try splitting the filename
