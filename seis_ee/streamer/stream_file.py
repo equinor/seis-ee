@@ -26,6 +26,8 @@ class StreamFile:
             date = grane_path_to_date(self.path)
             self.decimated_path = f"{os.getcwd()}/decimated_grane_files/{date.year}/{date.month}"
             decimate_grane(self.path, nodes, destination=self.decimated_path)
+        elif (self.file_type == FilesFormat.SEGD_SNORRE.value):
+            raise NotImplemented(f"Decimation for Snorre files is not supported yet")
         self.decimated = True
         self.database.update(self)
 

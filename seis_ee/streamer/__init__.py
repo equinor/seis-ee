@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from time import sleep
 from typing import List, Set
+import time
 
 from decimate import get_nodes
 from find_files.oseberg import _datetime_to_oseberg_path
@@ -17,6 +18,8 @@ def files_in_todays_directory(target_dir: str, format: str) -> Set[str]:
         path = _datetime_to_oseberg_path(date, target_dir)
     elif (format == FilesFormat.SEGD_GRANE.value):
         path = Path("grane/") # todo - update this path when going in production
+    elif(format == FilesFormat.SEGD_SNORRE.value):
+        path = Path("snorre/")
     target = Path(path)
     files = [str(x.resolve()) for x in target.rglob("*") if x.is_file()]
     return set(files)
@@ -50,6 +53,8 @@ def transfer_new_files(new_files: Set, database: Database, sensors: [], processe
 #   "path": { "decimated": bool, "decimated_path": "path/to/decimated/file", "transferred": bool }
 # }
 def main(target_dir, sensor_list, format, file_detection_type):
+    if (format == FilesFormat.SEGD_SNORRE.value):
+        raise NotImplemented(f"Decimation for Snorre files is not supported yet")
     database = Database(format)
     # Delete all records older than x(2) days, as they are not relevant
     database.delete_old_rows()
@@ -79,7 +84,7 @@ def main(target_dir, sensor_list, format, file_detection_type):
                 sleep((minimum_time_loop - elapsed).seconds)
 
             print("Looking for new files...")
-            new_files: Set = files_in_todays_directory(target_dir).difference(processed)
+            new_files: Set = files_in_todays_directory(target_dir, format).difference(processed)
             print(f"Found {len(new_files)} new files")
     elif (file_detection_type == FileDetectionTypes.INOTIFY.value):
         # stream new files not already in database
@@ -93,13 +98,25 @@ def main(target_dir, sensor_list, format, file_detection_type):
         # add functionality for watching tree of folders instead of only one folder
         watcher = inotify.adapters.InotifyTree(target_dir)
 
+        if (format == FilesFormat.SU_OSEBERG.value):
+            file_extension = ".su"
+            delay_for_create = 2
+        elif (format == FilesFormat.SEGD_GRANE.value):
+            file_extension = ".sgd"
+            delay_for_create = 3
+        elif (format == FilesFormat.SEGD_SNORRE.value):
+            file_extension = ".sgd"
+            delay_for_create = 3
+
         # check if events in target directory occur
         for event in watcher.event_gen(yield_nones=False):
             (_, event_type_names, path, filename) = event
             filepath: str = f"{path}/{filename}"
 
             # Transfer file if new file is created
-            if (InotifyEvents.IN_CREATE.value in event_type_names and Path(filepath).is_file()):
+            if (InotifyEvents.IN_CREATE.value in event_type_names and file_extension in filename):
+                #wait for file to be created /initialized before performing actions on it
+                time.sleep(delay_for_create)
                 file = StreamFile(filepath, database, format)
                 file.insert()
                 work_file(file, sensors)
