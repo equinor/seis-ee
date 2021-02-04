@@ -6,6 +6,7 @@ from find_files.oseberg import oseberg_path_to_date
 from find_files.grane import grane_path_to_date
 from streamer.transfer import transfer_file
 from config import FilesFormat
+from pathlib import Path
 
 
 class StreamFile:
@@ -23,7 +24,7 @@ class StreamFile:
             self.decimated_path = f"{os.getcwd()}/decimated_oseberg_files/{date.year}/{date.month}"
             decimate_oseberg(self.path, nodes, destination=self.decimated_path)
         elif(self.file_type == FilesFormat.SEGD_GRANE.value):
-            date = grane_path_to_date(self.path)
+            date = grane_path_to_date(Path(self.path))
             self.decimated_path = f"{os.getcwd()}/decimated_grane_files/{date.year}/{date.month}"
             decimate_grane(self.path, nodes, destination=self.decimated_path)
         elif (self.file_type == FilesFormat.SEGD_SNORRE.value):
