@@ -16,6 +16,11 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
 ADD seis_ee /app
+
+#change permission of decimate folder to be able to run the decimate command from the sentry project
+RUN chown -R seis:seis /decimate
+RUN chmod -R 700 /decimate
+
 USER seis
 WORKDIR /data
 #ENTRYPOINT ["python3", "/app/seis_ee.py"]

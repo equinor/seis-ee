@@ -3,7 +3,7 @@ import os
 
 import click
 
-from config import Config, FileDetectionTypes
+from config import Config
 from decimate import decimate_files
 from file_finder import file_finder
 from streamer import main

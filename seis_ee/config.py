@@ -6,10 +6,15 @@ class FileDetectionTypes(Enum):
     INOTIFY = "inotify"
     REGULAR = "regular"
 
+class FilesFormat(Enum):
+    SEGD_GRANE = "segd-grane"
+    SU_OSEBERG = "su-oseberg"
+    SEGD_SNORRE = "segd-snorre"
+
 class Config:
     decimated_files_dest = os.getenv("DECIMATED_FILES_DEST", "decimated_files")
     find_files_format = ["filename", "su-header"]
-    reduce_files_options = ["segd-grane", "su-oseberg"]
+    reduce_files_options = [FilesFormat.SEGD_GRANE.value, FilesFormat.SU_OSEBERG.value, FilesFormat.SEGD_SNORRE.value]
     detection_types = [FileDetectionTypes.INOTIFY.value, FileDetectionTypes.REGULAR.value]
     stream_server_user = "kkje"   #"root"
     stream_server_host = "hnet.norwayeast.cloudapp.azure.com"   #"192.168.1.5"
@@ -23,4 +28,5 @@ class FindFilesFormat(Enum):
 
 class InotifyEvents(Enum):
     IN_CREATE = "IN_CREATE"
+    IN_CLOSE_WRITE = "IN_CLOSE_WRITE"
 

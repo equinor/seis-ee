@@ -7,16 +7,12 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, List
 
-from config import Config
-# from readers.segd import number_of_samples_in_segd_file
+from config import Config, FilesFormat
+from readers.segd import number_of_samples_in_segd_file
 from utils import logger
 
-decimate_result_location = "/data/decimated_files"
-
-
-class DecimateFormat(Enum):
-    SEGD_GRANE = "segd-grane"
-    SU_OSEBERG = "su-oseberg"
+decimate_oseberg_result_location = "/data/decimated_oseberg_files"
+decimate_grane_result_location = "/data/decimated_grane_files"
 
 
 def get_files(path: str) -> List[Dict]:
@@ -30,47 +26,48 @@ def event_as_directory_name(event: str) -> str:
 
 
 def get_nodes(path: str, format):
-    with open(path) as csvfile:
+    with open(path, encoding="utf-8-sig") as csvfile:   # on windows, you might need to use the utf-8-sig encoding
         reader = csv.DictReader(csvfile)
-        if format == DecimateFormat.SEGD_GRANE.value:
+        if format == FilesFormat.SEGD_GRANE.value:
             return [int(row["nodeName"]) for row in reader if row]
         else:
             return [int(row["nodeNumber"]) for row in reader if row]
 
 
-# def decimate_grane(file_dict, nodes):
-#     samples = number_of_samples_in_segd_file(file_dict["path"])
-#     conf = {
-#         "name": "hnet",
-#         "format": DecimateFormat.SEGD_GRANE.value,
-#         "description": "30 nodes from grane for HNET",
-#         "included_nodenames": nodes,
-#         "samples": samples
-#     }
-#     conf_string = json.dumps(conf)
-#
-#     destination = f"{Config.decimated_files_dest}/{event_as_directory_name(file_dict['event'])}"
-#
-#     # Workaround for bug where Decimate crashes with missing dir
-#     os.makedirs(destination, exist_ok=True)
-#
-#     try:
-#         logger.info(f"Decimating {file_dict['path']}...")
-#         logger.info(f"Samples per trace: {samples}")
-#         decimate_process = subprocess.run(
-#             args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_dict['path']}",
-#             shell=True, check=True, capture_output=True, encoding="UTF-8")
-#
-#         logger.info(decimate_process.stderr)
-#     except subprocess.CalledProcessError as e:
-#         logger.warning(e.stderr)
-#         raise Exception(e.stderr)
+# TODO add the package segdpy with docker. Now, this package is installed manually... if this package is not installed you cannot run decimate_grane
+# the segdpy package from github is installed locally by just unzipping the python files to the local folder seis_ee / segdpy
+def decimate_grane(file_path: str, nodes: List[int], destination: str = decimate_grane_result_location):
+    samples = number_of_samples_in_segd_file(file_path)
+    conf = {
+        "name": "hnet",
+        "format": FilesFormat.SEGD_GRANE.value,
+        "description": "30 nodes from grane for HNET",
+        "included_nodenames": nodes,
+        "samples": samples
+    }
+    conf_string = json.dumps(conf)
+
+    # Workaround for bug where Decimate crashes with missing dir
+    os.makedirs(destination, exist_ok=True)
+
+
+    try:
+        logger.info(f"Decimating {file_path}...")
+        logger.info(f"Samples per trace: {samples}")
+        decimate_process = subprocess.run(
+            args=f"cd /decimate; decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_path}",
+            shell=True, check=True, capture_output=True, encoding="UTF-8")
+
+        logger.info(decimate_process.stderr)
+    except subprocess.CalledProcessError as e:
+        logger.warning(e.stderr)
+        raise Exception(e.stderr)
 
 
 def decimate_oseberg_old(file_dict, nodes):
     conf = {
         "name": "hnet",
-        "format": DecimateFormat.SU_OSEBERG.value,
+        "format": FilesFormat.SU_OSEBERG.value,
         "description": "30 nodes from oseberg for HNET",
         "included_nodenames": nodes
     }
@@ -95,10 +92,10 @@ def decimate_oseberg_old(file_dict, nodes):
         raise Exception(e.returncode)
 
 
-def decimate_oseberg(file_path: str, nodes: List[int], destination: str = "./"):
+def decimate_oseberg(file_path: str, nodes: List[int], destination: str = decimate_oseberg_result_location):
     conf = {
         "name": "ccs",
-        "format": DecimateFormat.SU_OSEBERG.value,
+        "format": FilesFormat.SU_OSEBERG.value,
         "description": "30 nodes from oseberg for CCS",
         "included_nodenames": nodes
     }
@@ -110,10 +107,10 @@ def decimate_oseberg(file_path: str, nodes: List[int], destination: str = "./"):
     if not Path(file_path).exists():
         raise FileNotFoundError(file_path)
 
-
     try:
+        # change to folder /decimtae folder in order to run the decimate command from sentry project
         subprocess.run(
-            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_path}",
+            args=f"cd /decimate; decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{conf_string}' {file_path}",
             shell=True, check=True, encoding="UTF-8")
 
     except subprocess.CalledProcessError as e:
@@ -126,19 +123,18 @@ def decimate_files(files_to_decimate_file, sensor_nodes_file, format):
 
     files_to_decimate_file = get_files(files_to_decimate_file)
     nodes_to_keep = get_nodes(sensor_nodes_file, format)
-
     failed_in_some_way = []
-    if format == DecimateFormat.SEGD_GRANE.value:
+    if format == FilesFormat.SEGD_GRANE.value:
         for line in files_to_decimate_file:
             try:
-                decimate_grane(line, nodes_to_keep)
+                decimate_grane(line['path'], nodes_to_keep)
             except Exception as e:
                 failed_in_some_way.append(f"{line['path']};exit_code: {str(e)}")
 
-    elif format == DecimateFormat.SU_OSEBERG.value:
+    elif format == FilesFormat.SU_OSEBERG.value:
         for line in files_to_decimate_file:
             try:
-                decimate_oseberg(line, nodes_to_keep)
+                decimate_oseberg(line['path'], nodes_to_keep)
             except FileNotFoundError:
                 logger.warning(f"{line['path']};exit_code: File not found!")
                 failed_in_some_way.append(f"{line['path']};exit_code: File not found!")

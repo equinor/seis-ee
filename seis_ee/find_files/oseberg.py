@@ -140,7 +140,6 @@ def requested_times_to_oseberg_paths(requested_times, target) -> [Path]:
     for chunk in time_chunks:
         path, file_time = datetime_to_oseberg_path(chunk["chunk"], target)
         paths.append({"path": path, "file_time": file_time, "event": chunk["event"]})
-
     return paths, len(paths)
 
 

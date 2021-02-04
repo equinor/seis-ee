@@ -5,17 +5,21 @@ from typing import Dict
 
 from utils import logger
 
-
-def grane_path_to_dates(path: Path):
-    # Try splitting the filename
-    elements = path.name.split("-")
-    if len(elements) < 5:
+def grane_path_to_date(path: Path) -> datetime:
+    #assume grane file name is on the format: 2019-10-26-07-43-59-Grane1035406.sgd
+    filename = path.name
+    filename_parts = filename.split("-")
+    if (len(filename_parts) < 5):
         logger.debug(f"Skipping file; {str(path)}")
         return
 
+    year, month, day, hour, min, sec = filename_parts[0], filename_parts[1], filename_parts[2], filename_parts[3], filename_parts[4], filename_parts[5]
+    return datetime(year=int(year), month=int(month), day=int(day), hour=int(hour), minute=int(min), second=int(sec))
+
+def grane_path_to_dates(path: Path):
     try:
-        first_date = datetime(year=int(elements[0]), month=int(elements[1]), day=int(elements[2]),
-                              hour=int(elements[3]), minute=int(elements[4]), second=int(elements[5]))
+        first_date = grane_path_to_date(path)
+
     except Exception as e:
         logger.info(f"Failed to parse filename into date; {path.name}")
         logger.info(e)
