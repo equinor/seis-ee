@@ -1,0 +1,1 @@
+![arc](./architecture.drawio.svg)

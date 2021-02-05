@@ -9,18 +9,13 @@ RUN python3 --version
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
 RUN pip install poetry
 
-
 RUN poetry config virtualenvs.create false
-WORKDIR /app
+WORKDIR /app/
 COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
-ADD seis_ee /app
-
-#change permission of decimate folder to be able to run the decimate command from the sentry project
-RUN chown -R seis:seis /decimate
-RUN chmod -R 700 /decimate
-
+ADD app /app/
+RUN chown -R seis:seis /app
 USER seis
-WORKDIR /data
-#ENTRYPOINT ["python3", "/app/seis_ee.py"]
+# TODO: create init.sh
+#ENTRYPOINT ["python3", "/app/app.py"]
