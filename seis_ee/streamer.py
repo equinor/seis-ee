@@ -6,19 +6,21 @@ from typing import List, Set
 import time
 
 from decimate import get_nodes
-from find_files.oseberg import _datetime_to_oseberg_path
-from streamer.db_service import Database
-from streamer.stream_file import StreamFile
+from services.database import Database
+from classes.stream_file import StreamFile
 from config import InotifyEvents, FileDetectionTypes, FilesFormat
+
+# TODO: Agree on a directory structure
+from utils import logger
 
 
 def files_in_todays_directory(target_dir: str, format: str) -> Set[str]:
     date = datetime.now()
     if (format == FilesFormat.SU_OSEBERG.value):
-        path = _datetime_to_oseberg_path(date, target_dir)
+        path = Path("oseberg/")
     elif (format == FilesFormat.SEGD_GRANE.value):
-        path = Path("grane/") # todo - update this path when going in production
-    elif(format == FilesFormat.SEGD_SNORRE.value):
+        path = Path("grane/")  # todo - update this path when going in production
+    elif (format == FilesFormat.SEGD_SNORRE.value):
         path = Path("snorre/")
     target = Path(path)
     files = [str(x.resolve()) for x in target.rglob("*") if x.is_file()]
@@ -39,21 +41,21 @@ def continue_unfinished(sensors: List[int], format):
     for file in unfinished:
         work_file(file, sensors)
 
-def transfer_new_files(new_files: Set, database: Database, sensors: [], processed: Set, file_format: str):
+
+def transfer_new_files(new_files: Set[str], database: Database, sensors: [int], processed: Set[str], file_format: str):
     # the parameter set new_files contains path for the new files to stream
     for path in new_files:
         file = StreamFile(path, database, file_format)
         file.insert()
         work_file(file, sensors)
     processed.update(new_files)
-    print(f"Transferred {len(new_files)}")
+    logger.info(f"Transferred {len(new_files)}")
     return processed
 
-# {
-#   "path": { "decimated": bool, "decimated_path": "path/to/decimated/file", "transferred": bool }
-# }
+
+# TODO: This function is too long :(
 def main(target_dir, sensor_list, format, file_detection_type):
-    if (format == FilesFormat.SEGD_SNORRE.value):
+    if format == FilesFormat.SEGD_SNORRE.value:
         raise NotImplemented(f"Decimation for Snorre files is not supported yet")
     database = Database(format)
     # Delete all records older than x(2) days, as they are not relevant
@@ -67,11 +69,11 @@ def main(target_dir, sensor_list, format, file_detection_type):
 
     # On first loop, load existing files from database
     processed: Set = set(database.select_all_paths())
-    print("Looking for new files...")
+    logger.debug("Looking for new files...")
     new_files: Set = files_in_todays_directory(target_dir, format).difference(processed)
-    print(f"Found {len(new_files)} new files")
+    logger.debug(f"Found {len(new_files)} new files")
 
-    if (file_detection_type == FileDetectionTypes.REGULAR.value):
+    if file_detection_type == FileDetectionTypes.REGULAR.value:
         minimum_time_loop = timedelta(seconds=30)
         # Loop indefinitely, streaming any new files
         while True:
@@ -86,27 +88,24 @@ def main(target_dir, sensor_list, format, file_detection_type):
             print("Looking for new files...")
             new_files: Set = files_in_todays_directory(target_dir, format).difference(processed)
             print(f"Found {len(new_files)} new files")
-    elif (file_detection_type == FileDetectionTypes.INOTIFY.value):
+    elif file_detection_type == FileDetectionTypes.INOTIFY.value:
         # stream new files not already in database
-        if (len(new_files) > 0):
+        if len(new_files) > 0:
             processed = transfer_new_files(new_files, database, sensors, processed, format)
 
         # create an Inotify watcher to detect changes in target directory
         watcher = inotify.adapters.Inotify()
         watcher.add_watch(target_dir)
 
+        # TODO: This might not be needed
         # add functionality for watching tree of folders instead of only one folder
         watcher = inotify.adapters.InotifyTree(target_dir)
 
-        if (format == FilesFormat.SU_OSEBERG.value):
+        # Default is grane/snorre .sgd format
+        file_extension = ".sgd"
+
+        if format == FilesFormat.SU_OSEBERG.value:
             file_extension = ".su"
-            delay_for_create = 2
-        elif (format == FilesFormat.SEGD_GRANE.value):
-            file_extension = ".sgd"
-            delay_for_create = 3
-        elif (format == FilesFormat.SEGD_SNORRE.value):
-            file_extension = ".sgd"
-            delay_for_create = 3
 
         # check if events in target directory occur
         for event in watcher.event_gen(yield_nones=False):
@@ -114,14 +113,11 @@ def main(target_dir, sensor_list, format, file_detection_type):
             filepath: str = f"{path}/{filename}"
 
             # Transfer file if new file is created
-            if (InotifyEvents.IN_CREATE.value in event_type_names and file_extension in filename):
-                #wait for file to be created /initialized before performing actions on it
-                time.sleep(delay_for_create)
+            if InotifyEvents.IN_CREATE.value in event_type_names and filename.endswith(file_extension):
+                # TODO: Find more robust method for this? Check for open file handlers etc.
+                # wait for file to be created /initialized before performing actions on it
+                time.sleep(2 if format is FilesFormat.SU_OSEBERG else 3)
                 file = StreamFile(filepath, database, format)
                 file.insert()
                 work_file(file, sensors)
-                print("Transferred file")
-
-
-if __name__ == '__main__':
-    main()
+                logger.info("Transferred file")

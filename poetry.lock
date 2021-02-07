@@ -196,6 +196,24 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "segdpy"
+version = "0.0.0"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+numpy = "*"
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/equinor/segdpy.git"
+reference = "master"
+resolved_reference = "d78702abef4dabe1aac7e4a0be813004589bc64e"
+
+[[package]]
 name = "segyio"
 version = "1.9.1"
 description = "Simple & fast IO for SEG-Y files"
@@ -237,7 +255,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "90eddd1ff3e363561fe036e0d39cb3a7e7e4a7382c5735525a94fe8fa5ccb739"
+content-hash = "d20bf6594c5f70c845ef0942b83c09c8852ba19e1c3b9cc3ab1018c4eada9e79"
 
 [metadata.files]
 atomicwrites = [
@@ -351,6 +369,7 @@ pytz = [
     {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
     {file = "pytz-2020.1.tar.gz", hash = "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"},
 ]
+segdpy = []
 segyio = [
     {file = "segyio-1.9.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:99e6d5d76d87d6fb96d82e5f5255fdea583394c34a233eaa32369a351a1e64ea"},
     {file = "segyio-1.9.1-cp27-cp27m-win32.whl", hash = "sha256:ca06d2809756e3321c001bec678a0e31feabe3b2b34c4845e058f7f2f39f9ad2"},

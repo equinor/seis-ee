@@ -7,7 +7,7 @@ services:
     volumes:
       - ./data:/data
 #       Update this line with your raw data location
-      - ./test_data/OsebergC-SWIM_01:/raw/oseberg/OsebergC-SWIM_01
+      - ./test_data/oseberg:/raw/oseberg/oseberg
       - ./test_data/oseberg_sensors.csv:/raw/oseberg_sensors.csv
       - ./ssh:/home/seis/.ssh
 

@@ -3,7 +3,7 @@ import sqlite3
 from sqlite3 import Error
 from typing import List
 
-from streamer.stream_file import StreamFile
+from classes.stream_file import StreamFile
 
 
 class Database:

@@ -32,25 +32,3 @@ def timeit(f):
         return result
 
     return wrap
-
-
-def load_requested_times(input=f"{os.getcwd()}/requested-times.csv"):
-    time_objects = []
-    with open(input) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for i, row in enumerate(reader):
-            # Skip empty rows
-            if not row:
-                continue
-            r_event = datetime.fromisoformat(row["event"])
-            r_from = datetime.fromisoformat(row["from"])
-            r_to = datetime.fromisoformat(row["to"])
-
-            # Test for invalid range (from larger than to)
-            if r_from >= r_to:
-                logger.warning(f"row {i} is invalid. From date is ending before to date. Skipping...")
-                continue
-            time_objects.append({"event": r_event,
-                                 "from": r_from,
-                                 "to": r_to})
-    return time_objects
