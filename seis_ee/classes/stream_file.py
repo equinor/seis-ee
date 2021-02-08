@@ -1,33 +1,36 @@
 import os
+from datetime import datetime
 from typing import List
 
 from decimate import decimate_oseberg, decimate_grane
-from find_files.oseberg import oseberg_path_to_date
-from find_files.grane import grane_path_to_date
 from streamer.transfer import transfer_file
 from config import FilesFormat
-from pathlib import Path
 
 
 class StreamFile:
-    def __init__(self, path: str, database, file_type: str, decimated: bool = False, transferred: bool = False, decimated_path: str = None):
+    def __init__(self, path: str, database, file_type: str, decimated: bool = False,
+                 transferred: bool = False, decimated_path: str = None):
         self.path = path
         self.decimated = decimated
         self.transferred = transferred
         self.decimated_path = decimated_path
         self.database = database
+        # TODO: Use enum type
         self.file_type = file_type
 
+    # TODO: After decimation, upload result file to Azure Files and delete from disk.
+    # TODO: This could perhaps be done async. ONLY IF we need the performance
     def decimate(self, nodes: List[int]):
-        if (self.file_type == FilesFormat.SU_OSEBERG.value):
-            date = oseberg_path_to_date(self.path)
+        if self.file_type == FilesFormat.SU_OSEBERG.value:
+            # Check headers , event, now(), or something
+            date = datetime.now()
             self.decimated_path = f"{os.getcwd()}/decimated_oseberg_files/{date.year}/{date.month}"
             decimate_oseberg(self.path, nodes, destination=self.decimated_path)
-        elif(self.file_type == FilesFormat.SEGD_GRANE.value):
-            date = grane_path_to_date(Path(self.path))
+        elif self.file_type == FilesFormat.SEGD_GRANE.value:
+            date = datetime.now()
             self.decimated_path = f"{os.getcwd()}/decimated_grane_files/{date.year}/{date.month}"
             decimate_grane(self.path, nodes, destination=self.decimated_path)
-        elif (self.file_type == FilesFormat.SEGD_SNORRE.value):
+        elif self.file_type == FilesFormat.SEGD_SNORRE.value:
             raise NotImplemented(f"Decimation for Snorre files is not supported yet")
         self.decimated = True
         self.database.update(self)
@@ -49,7 +52,8 @@ class StreamFile:
 
     @classmethod
     def from_tuple(cls, a_tuple, database):
-        return cls(path=a_tuple[0], database=database, decimated=a_tuple[1], transferred=a_tuple[2], decimated_path=a_tuple[3], file_type=a_tuple[4])
+        return cls(path=a_tuple[0], database=database, decimated=a_tuple[1],
+                   transferred=a_tuple[2], decimated_path=a_tuple[3], file_type=a_tuple[4])
 
     def to_dict(self):
         return {
