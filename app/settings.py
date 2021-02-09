@@ -4,11 +4,6 @@ from typing import List
 from pydantic import BaseSettings
 
 
-class FileDetectionTypes(Enum):
-    INOTIFY = "inotify"
-    REGULAR = "regular"
-
-
 class FieldStorageContainers(Enum):
     OSEBERG = "OSEBERG"
     GRANE = "GRANE"
@@ -28,7 +23,8 @@ class Settings(BaseSettings):
     STREAM_TARGET_USER: str = "kkje"
     STREAM_TARGET_HOST: str = "hnet.norwayeast.cloudapp.azure.com"
     STREAM_TARGET_DIR: str = "/data/kjtest"
-    FILES_CONN_STRING: str
+    ENVIRONMENT: str = "dev"
+    STORAGE_CONN_STRING: str
     FILES_SHARE: str = "oseberg"
     BLOB_CONN_STRING: str
     BLOB_STORAGE_ACCOUNT: str = "devstoreaccount1"
@@ -40,15 +36,9 @@ class Settings(BaseSettings):
     REDUCE_FILES_OPTIONS: List[str] = [FileFormat.SEGD_GRANE.value, FileFormat.SU_OSEBERG.value,
                                        FileFormat.SEGD_SNORRE.value]
 
-
-class FindFilesFormat(Enum):
-    FILENAME = "filename"
-    SU_HEADER = "su-header"
-
-
-class InotifyEvents(Enum):
-    IN_CREATE = "IN_CREATE"
-    IN_CLOSE_WRITE = "IN_CLOSE_WRITE"
+    class Config:
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
 
 
 settings = Settings()

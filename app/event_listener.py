@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, status
 from classes.event import Event
 from services.az_files_service import az_files_service
 from services.blob_service import blob_service
+from services.queue_service import convert_queue, stream_queue
 from settings import FieldStorageContainers, FileFormat, settings
 from streamer import StreamFile
 from utils import logger
@@ -45,13 +46,21 @@ def format_from_blob_url(url: str):
 def handle_new_blob_event(event: Event):
     format = format_from_blob_url(event.data.url)
     filename = event.data.url.split("/", 4)[4]
+
     # Download the raw file from the common BlobStorage
     filepath = blob_service.download_blob(filename)
     file = StreamFile(filepath, format)
+
     # Decimate the file
     file.decimate()
+
     # Upload the decimated file to AzureFiles
-    az_files_service.upload_file(file.decimated_path)
+    uploaded_path = az_files_service.upload_file(file.decimated_path)
+
+    # Add new messages to the queues
+    stream_queue.send_message({"format": format.value, "path": uploaded_path})
+    convert_queue.send_message({"format": format.value, "path": uploaded_path})
+
     # Cleanup
     delete_file(filepath)
     delete_file(file.decimated_path)

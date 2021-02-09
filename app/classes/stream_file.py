@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -8,13 +9,10 @@ from transfer import transfer_file
 
 
 class StreamFile:
-    def __init__(self, path: str, format: FileFormat, decimated: bool = False,
-                 transferred: bool = False, decimated_path: str = None):
+    def __init__(self, path: str, format: FileFormat):
         self.path = path
-        self.decimated = decimated
-        self.transferred = transferred
-        self.decimated_path = decimated_path
         self.format: FileFormat = format
+        self.decimated_path: str = ""
 
     # TODO: After decimation, upload result file to Azure Files and delete from disk.
     # TODO: This could perhaps be done async. ONLY IF we need the performance
@@ -33,31 +31,29 @@ class StreamFile:
             self.decimated_path = output_dir + "/" + Path(self.path).stem + ".ccs.segy"
         elif self.format == FileFormat.SEGD_SNORRE:
             raise NotImplemented(f"Decimation for Snorre files is not supported yet")
-        self.decimated = True
 
     def transfer(self):
         transfer_file(self.path)
-        self.transferred = True
 
-    @classmethod
-    def from_dict(cls, a_dict):
-        return cls(**a_dict)
-
-    @classmethod
-    def from_tuple(cls, a_tuple):
-        return cls(path=a_tuple[0], decimated=a_tuple[1],
-                   transferred=a_tuple[2], decimated_path=a_tuple[3], format=FileFormat[a_tuple[4]])
-
-    def to_dict(self):
-        return {
-            "path": self.path,
-            "decimated": self.decimated,
-            "transferred": self.transferred,
-            "decimated_path": self.decimated_path
-        }
-
-    def to_tuple(self):
-        return self.path, self.decimated, self.transferred, self.decimated_path, self.format.value
+    # @classmethod
+    # def from_dict(cls, a_dict):
+    #     return cls(**a_dict)
+    #
+    # @classmethod
+    # def from_tuple(cls, a_tuple):
+    #     return cls(path=a_tuple[0], decimated=a_tuple[1],
+    #                transferred=a_tuple[2], decimated_path=a_tuple[3], format=FileFormat[a_tuple[4]])
+    #
+    # def to_dict(self):
+    #     return {
+    #         "path": self.path,
+    #         "decimated": self.decimated,
+    #         "transferred": self.transferred,
+    #         "decimated_path": self.decimated_path
+    #     }
+    #
+    # def to_tuple(self):
+    #     return self.path, self.decimated, self.transferred, self.decimated_path, self.format.value
 
     def __repr__(self):
         return f"Path: {self.path}, Decimated: {self.decimated}, Transferred: {self.transferred}"

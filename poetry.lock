@@ -59,6 +59,19 @@ cryptography = ">=2.1.4"
 msrest = ">=0.6.18"
 
 [[package]]
+name = "azure-storage-queue"
+version = "12.1.5"
+description = "Microsoft Azure Azure Queue Storage Client Library for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+azure-core = ">=1.10.0,<2.0.0"
+cryptography = ">=2.1.4"
+msrest = ">=0.6.10"
+
+[[package]]
 name = "behave"
 version = "1.2.6"
 description = "behave is behaviour-driven development, Python style"
@@ -542,7 +555,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "58147c5d021032a74a08d47c58368f1528cf25bfcdd6dfb7eb5fdca7990489dd"
+content-hash = "7af3e58b70244a53862e1f2513d43897874151e561f70b5ed74f282723e67928"
 
 [metadata.files]
 atomicwrites = [
@@ -564,6 +577,10 @@ azure-storage-blob = [
 azure-storage-file-share = [
     {file = "azure-storage-file-share-12.4.1.zip", hash = "sha256:7503d05882970abc977529ff5a4b81e79f62fd51b238fe306f72e13f57a522ca"},
     {file = "azure_storage_file_share-12.4.1-py2.py3-none-any.whl", hash = "sha256:c08365049e2f605541135be970493e6f92a35e617c3a9bc9916e0c35e4bba14e"},
+]
+azure-storage-queue = [
+    {file = "azure-storage-queue-12.1.5.zip", hash = "sha256:f0f2f4064120c05a0b594cb504321b523cefd47329a047dd885bb30978100180"},
+    {file = "azure_storage_queue-12.1.5-py2.py3-none-any.whl", hash = "sha256:038b3a0e4494e34a0a60a7bf9f98a77df65ed768b1db3c60e6ac2727ceb33469"},
 ]
 behave = [
     {file = "behave-1.2.6-py2.py3-none-any.whl", hash = "sha256:ebda1a6c9e5bfe95c5f9f0a2794e01c7098b3dde86c10a95d8621c5907ff6f1c"},

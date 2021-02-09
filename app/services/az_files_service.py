@@ -10,7 +10,7 @@ from utils import logger
 
 class AzFilesService:
     def __init__(self):
-        self.conn_str = settings.FILES_CONN_STRING
+        self.conn_str = settings.STORAGE_CONN_STRING
         self.share = settings.FILES_SHARE
         self.client = ShareServiceClient.from_connection_string(self.conn_str)
         try:
@@ -42,6 +42,8 @@ class AzFilesService:
             logger.error("ResourceExistsError:", ex.message)
         except ResourceNotFoundError as ex:
             logger.error("ResourceNotFoundError:", ex.message)
+
+        return name_to_upload_as
 
     def file_exists(self, path: str) -> bool:
         try:
