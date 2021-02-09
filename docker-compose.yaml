@@ -2,13 +2,12 @@ version: "3.4"
 services:
   seis_ee:
     image: seis-ee
-#    entrypoint: bash
     build: .
+    ports:
+      - "80:5000"
+    environment:
+      BLOB_CONN_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage-emulator:10000/devstoreaccount1;
+      FILES_CONN_STRING: ${FILES_CONN_STRING}
     volumes:
-      - ./data:/data
-#       Update this line with your raw data location
-      - ./test_data/oseberg:/raw/oseberg/oseberg
-      - ./test_data/oseberg_sensors.csv:/raw/oseberg_sensors.csv
-      - ./ssh:/home/seis/.ssh
-
-    entrypoint: python3 /app/seis_ee.py
+      - ./data:/app/data
+    command: python3 /app/event_listener.py

@@ -11,11 +11,15 @@ click = "^7.1.2"
 segyio = "^1.9.1"
 numpy = "^1.19.1"
 pandas = "^1.1.1"
-inotify = "^0.2.10"
-segdpy = {git = "ssh://git@github.com/equinor/segdpy.git"}
+fastapi = "^0.63.0"
+uvicorn = "^0.13.3"
+azure-storage-blob = "^12.7.1"
+azure-storage-file-share = "^12.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"
+python-dotenv = "^0.15.0"
+behave = "^1.2.6"
 
 [build-system]
 requires = ["poetry>=0.12"]
