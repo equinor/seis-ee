@@ -43,6 +43,8 @@ class AzFilesService:
         except ResourceNotFoundError as ex:
             logger.error("ResourceNotFoundError:", ex.message)
 
+        return name_to_upload_as
+
     def file_exists(self, path: str) -> bool:
         try:
             file_client = ShareFileClient.from_connection_string(self.conn_str, self.share, path)
