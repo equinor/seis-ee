@@ -8,7 +8,7 @@ from settings import settings
 
 class AzQueueService:
     def __init__(self, name: str):
-        self.conn_str = settings.STORAGE_CONN_STRING
+        self.conn_str = settings.QUEUE_CONN_STRING
         self.name = f"{settings.ENVIRONMENT}-{name}"
         self.client = QueueClient.from_connection_string(self.conn_str, self.name)
         try:
@@ -27,11 +27,9 @@ class AzQueueService:
     def delete_message(self, message: QueueMessage):
         self.client.delete_message(message)
 
+    def clear_messages(self):
+        self.client.clear_messages()
+
 
 stream_queue = AzQueueService("stream")
 convert_queue = AzQueueService("convert")
-
-if __name__ == '__main__':
-    stream_queue.send_message({"t": 123})
-    message = stream_queue.fetch_message()
-    stream_queue.delete_message(message)

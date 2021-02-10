@@ -7,6 +7,7 @@ from classes.event import Event
 from event_listener import events
 from services.az_files_service import az_files_service
 from services.blob_service import blob_service
+from services.queue_service import convert_queue, stream_queue
 
 
 @given("there are files in the blob storage")
@@ -33,3 +34,27 @@ def step_impl(context):
 def step_impl(context):
     # TODO: Can't request specific message. Do something smart
     pass
+
+
+@given("an empty stream-queue")
+def step_impl(context):
+    stream_queue.clear_messages()
+
+
+@step("an empty convert-queue")
+def step_impl(context):
+    convert_queue.clear_messages()
+
+
+@when("a message is sent")
+def step_impl(context):
+    stream_queue.send_message({"Hallo": "sTream"})
+    convert_queue.send_message({"Some": "Data", "Foo": "Bar"})
+
+
+@then("the queues contains messages")
+def step_impl(context):
+    stream_msg = stream_queue.fetch_message()
+    convert_msg = convert_queue.fetch_message()
+    assert stream_msg
+    assert convert_msg
