@@ -26,5 +26,4 @@ RUN poetry install
 ADD app /app/
 RUN chown -R seis:seis /app
 USER seis
-# TODO: create init.sh
-#ENTRYPOINT ["python3", "/app/app.py"]
+ENTRYPOINT /app/init.sh

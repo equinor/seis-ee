@@ -5,7 +5,7 @@ from pathlib import Path
 from behave import given, when, then, step
 
 from classes.event import Event
-from event_listener import events
+from decimator import events
 from services.az_files_service import az_files_service
 from services.blob_service import BlobService
 from services.queue_service import convert_queue, stream_queue

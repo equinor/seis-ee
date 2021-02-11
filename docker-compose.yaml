@@ -1,12 +1,30 @@
 version: "3.4"
 services:
-  seis_ee:
-    image: seis-ee
+  decimate:
+    image: ghcr.io/equinor/css-passive
     build: .
     ports:
       - "80:5000"
     environment:
       FILES_CONN_STRING: ${FILES_CONN_STRING}
+      RUN_MODE: decimator
     volumes:
       - ./data:/app/data
-    command: python3 /app/event_listener.py
+
+  streamer:
+    image: ghcr.io/equinor/css-passive
+    build: .
+    environment:
+      FILES_CONN_STRING: ${FILES_CONN_STRING}
+      RUN_MODE: streamer
+    volumes:
+      - ./data:/app/data
+
+  converter:
+    image: ghcr.io/equinor/css-passive
+    build: .
+    environment:
+      FILES_CONN_STRING: ${FILES_CONN_STRING}
+      RUN_MODE: converter
+    volumes:
+      - ./data:/app/data

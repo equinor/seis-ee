@@ -1,0 +1,55 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: ccs-passive
+spec:
+  environments:
+    - name: prod
+      build:
+        from: master
+  components:
+    - name: decimator
+      image: ghcr.io/equinor/css-passive
+      alwaysPullImageOnDeploy: true
+      variables:
+        ENVIRONMENT: prod
+        RUN_MODE: decimator
+        GRANE_SENSORS: [1, 2, 3, 5]
+        OSEBERG_SENSORS: [12, 21]
+        SNORRE_SENSORS: [1, 2, 3, 5]
+      ports:
+        - name: http
+          port: 5000
+      publicPort: http
+      secrets:
+        - BLOB_CONN_STRING
+        - FILES_CONN_STRING
+        - QUEUE_CONN_STRING
+
+    - name: converter
+      image: ghcr.io/equinor/css-passive
+      alwaysPullImageOnDeploy: true
+      variables:
+        ENVIRONMENT: prod
+        RUN_MODE: decimator
+      secrets:
+        - FILES_CONN_STRING
+        - QUEUE_CONN_STRING
+
+    - name: streamer
+      image: ghcr.io/equinor/css-passive
+      alwaysPullImageOnDeploy: true
+      variables:
+        ENVIRONMENT: prod
+        RUN_MODE: decimator
+        STREAM_TARGET_USER: seis
+        STREAM_TARGET_HOST: 192.168.1.5
+        STREAM_TARGET_DIR: /data/css
+      secrets:
+        - FILES_CONN_STRING
+        - QUEUE_CONN_STRING
+        - SSH_PRIVATE_KEY
+
+  dnsAppAlias:
+    environment: prod
+    component: decimator
