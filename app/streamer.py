@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 from typing import List, Set
 from services.database import Database
@@ -10,7 +9,6 @@ from utils import logger
 
 
 def files_in_todays_directory(target_dir: str, format: str) -> Set[str]:
-    date = datetime.now()
     if format == FileFormat.SU_OSEBERG.value:
         path = Path("oseberg/")
     elif format == FileFormat.SEGD_GRANE.value:

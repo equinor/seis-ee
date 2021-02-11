@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -30,7 +29,7 @@ class StreamFile:
             # TODO: Is this right suffix?
             self.decimated_path = output_dir + "/" + Path(self.path).stem + ".ccs.segy"
         elif self.format == FileFormat.SEGD_SNORRE:
-            raise NotImplemented(f"Decimation for Snorre files is not supported yet")
+            raise NotImplementedError("Decimation for Snorre files is not supported yet")
 
     def transfer(self):
         transfer_file(self.path)

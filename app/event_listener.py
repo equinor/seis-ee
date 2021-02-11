@@ -71,10 +71,12 @@ def handle_new_blob_event(event: Event):
 def validate_event(event: Event):
     account = event.data.url.split("/")[2].split(".")[0]
     container = event.data.url.split("/")[3]
-    if account != settings.STORAGE_ACCOUNT or \
-            container != settings.BLOB_STORAGE_CONTAINER or \
-            event.eventType != 'Microsoft.Storage.BlobCreated' or \
-            event.data.blobType != "BlockBlob":
+    if (
+        account != settings.STORAGE_ACCOUNT
+        or container != settings.BLOB_STORAGE_CONTAINER
+        or event.eventType != "Microsoft.Storage.BlobCreated"
+        or event.data.blobType != "BlockBlob"
+    ):
         return False
     return True
 
