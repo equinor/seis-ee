@@ -37,8 +37,9 @@ class BlobService:
                 blob_file.write(raw)
             except ResourceNotFoundError as error:
                 logger.warning(error)
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                    detail=f"Requested Blob not found('{filename}')")
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Requested Blob not found('{filename}')"
+                )
         return str(Path(f"{settings.TMP_BLOB_DIR}/{filename}").absolute())
 
 

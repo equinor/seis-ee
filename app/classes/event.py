@@ -9,6 +9,7 @@ class EventData(BaseModel):
     """
     My Cool model
     """
+
     api: str
     contentType: str
     contentLength: int

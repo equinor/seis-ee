@@ -20,8 +20,16 @@ class FileFormat(Enum):
 # Will use env variables, and set default. Also parses complex data as json-strings
 class Settings(BaseSettings):
     # Azurite default connection string
-    QUEUE_CONN_STRING: str = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://localhost:10001/devstoreaccount1;"
-    BLOB_CONN_STRING: str = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;"
+    QUEUE_CONN_STRING: str = (
+        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
+        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+        "QueueEndpoint=http://localhost:10001/devstoreaccount1;"
+    )
+    BLOB_CONN_STRING: str = (
+        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
+        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+        "BlobEndpoint=http://localhost:10000/devstoreaccount1;"
+    )
     FILES_CONN_STRING: str
     STORAGE_ACCOUNT: str = "devstoreaccount1"
     BLOB_STORAGE_CONTAINER: str = "oseberg"
@@ -34,13 +42,16 @@ class Settings(BaseSettings):
     GRANE_SENSORS: List[int] = [1, 2, 3, 5]
     OSEBERG_SENSORS: List[int] = [12, 21]
     SNORRE_SENSORS: List[int] = [1, 2, 3, 5]
-    REDUCE_FILES_OPTIONS: List[str] = [FileFormat.SEGD_GRANE.value, FileFormat.SU_OSEBERG.value,
-                                       FileFormat.SEGD_SNORRE.value]
+    REDUCE_FILES_OPTIONS: List[str] = [
+        FileFormat.SEGD_GRANE.value,
+        FileFormat.SU_OSEBERG.value,
+        FileFormat.SEGD_SNORRE.value,
+    ]
     ENVIRONMENT: str = "dev"
 
     class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 
 settings = Settings()
