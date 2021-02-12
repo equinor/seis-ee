@@ -7,3 +7,5 @@
 /data/
 /ssh/
 .vscode
+/app/data/
+/app/test_data/

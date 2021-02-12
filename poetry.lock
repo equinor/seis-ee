@@ -595,17 +595,6 @@ requests = ">=2.0.0"
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
-name = "segyio"
-version = "1.9.5"
-description = "Simple & fast IO for SEG-Y files"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-numpy = ">=1.10"
-
-[[package]]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -712,7 +701,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "90c793f002ddcadb24260bf96ecb6a9a024309cd72176e3c6c97d1e411cc0148"
+content-hash = "4fcb8beae9ca1340e6dca1b808af52252f784c785a082a3d675cc8c4b6594c57"
 
 [metadata.files]
 appdirs = [
@@ -1086,24 +1075,6 @@ requests-oauthlib = [
     {file = "requests-oauthlib-1.3.0.tar.gz", hash = "sha256:b4261601a71fd721a8bd6d7aa1cc1d6a8a93b4a9f5e96626f8e4d91e8beeaa6a"},
     {file = "requests_oauthlib-1.3.0-py2.py3-none-any.whl", hash = "sha256:7f71572defaecd16372f9006f33c2ec8c077c3cfa6f5911a9a90202beb513f3d"},
     {file = "requests_oauthlib-1.3.0-py3.7.egg", hash = "sha256:fa6c47b933f01060936d87ae9327fead68768b69c6c9ea2109c48be30f2d4dbc"},
-]
-segyio = [
-    {file = "segyio-1.9.5-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:a87a69d28a77a6578232dc5ee59fac7fe202df8240d97ca1e9e91da5b90c9296"},
-    {file = "segyio-1.9.5-cp35-cp35m-win32.whl", hash = "sha256:f6a6bf0e2d12f34cb00df94daf67001faa871b49be563ac668e526646e4d4f6b"},
-    {file = "segyio-1.9.5-cp35-cp35m-win_amd64.whl", hash = "sha256:26fa4478cf8a1c81400c89a9f0ab8d249f10bea43598998568b375b0fed493b1"},
-    {file = "segyio-1.9.5-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:85202dd518f8d63ecad19d2e9aec0e9985e03dfdd8294d7ec4c291e3f65ef4d7"},
-    {file = "segyio-1.9.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:2941d2052f9871694009bcc777f2d831f2d1cf9ae27693cc243737e369320d59"},
-    {file = "segyio-1.9.5-cp36-cp36m-win32.whl", hash = "sha256:a1f6cdfa1f7cd9de87911102cb2f7ad2bf4e7dc3173b39bbb905d554ed000ace"},
-    {file = "segyio-1.9.5-cp36-cp36m-win_amd64.whl", hash = "sha256:ca37a9f4b98d5a2974129a3dc28166b2ff28ca63bce97e46edcd31db076bd58e"},
-    {file = "segyio-1.9.5-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:d719376718f080daba5b0a0aea0a11043cb75567876b2330fb8e96f893c5bf93"},
-    {file = "segyio-1.9.5-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:f44bcef53dc1a2a35a728652463fa256087eef4449689f38ecee428ff1b3a9e5"},
-    {file = "segyio-1.9.5-cp37-cp37m-win32.whl", hash = "sha256:1b5696ef39d7794b86e159e5ab48297db2205b73be3d1958515de7ca4eee7393"},
-    {file = "segyio-1.9.5-cp37-cp37m-win_amd64.whl", hash = "sha256:0af5ab7eee98b8ad551a0db153ff0dfdfed41f291c4e049780cea98f66b7cd2f"},
-    {file = "segyio-1.9.5-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:a59090c85d4f03ed36bfea3d704a787f658dd53dc0a39934a3bcef136bae3831"},
-    {file = "segyio-1.9.5-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:ac41eae55369b9000f28fcb750275d3ce17641948462b3ad4f8566a82951278e"},
-    {file = "segyio-1.9.5-cp38-cp38-win32.whl", hash = "sha256:b84af19286c42a5b9e78bc6762cd566a31852c7167483ae94f3ea5a6259dd61f"},
-    {file = "segyio-1.9.5-cp38-cp38-win_amd64.whl", hash = "sha256:b8bcb1ac66a470d24d5c000f4821f92f424f67cd910c60e12eaa9453329c8097"},
-    {file = "segyio-1.9.5.tar.gz", hash = "sha256:33dee186152225ed4a8b61a5825787c6d26944d63eb4a6f61f401425695b4f43"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},

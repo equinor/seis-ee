@@ -6,21 +6,21 @@ from azure.storage.blob import BlobServiceClient, BlobClient
 from fastapi import HTTPException
 from starlette import status
 
-from settings import settings
+from settings import FieldStorageContainers, settings
 from utils import logger
 
 
 class BlobService:
-    def __init__(self):
-        self.container = settings.BLOB_STORAGE_CONTAINER
+    def __init__(self, container: FieldStorageContainers):
+        self.container: FieldStorageContainers = container
         self.client = BlobServiceClient.from_connection_string(settings.BLOB_CONN_STRING)
         try:
-            self.client.create_container(self.container)
+            self.client.create_container(self.container.value)
         except ResourceExistsError:
             pass
 
     def blob_client(self, filename: str) -> BlobClient:
-        return self.client.get_blob_client(container=self.container, blob=filename)
+        return self.client.get_blob_client(container=self.container.value, blob=filename)
 
     def upload_blob(self, path: str):
         logger.debug(f"Uploading to Azure Storage as blob: {path}")
@@ -41,6 +41,3 @@ class BlobService:
                     status_code=status.HTTP_404_NOT_FOUND, detail=f"Requested Blob not found('{filename}')"
                 )
         return str(Path(f"{settings.TMP_BLOB_DIR}/{filename}").absolute())
-
-
-blob_service = BlobService()

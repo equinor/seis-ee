@@ -8,7 +8,6 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.6.1"
 click = "^7.1.2"
-segyio = "^1.9.1"
 numpy = "^1.19.1"
 pandas = "^1.1.1"
 fastapi = "^0.63.0"
