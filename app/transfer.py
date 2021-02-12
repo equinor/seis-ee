@@ -1,9 +1,9 @@
 import subprocess
+import json
 from pathlib import Path
 
 from settings import settings
 from utils import logger
-
 
 def ensure_remote_path(path: str):
     try:
@@ -26,3 +26,15 @@ def transfer_file(target: str):
     except subprocess.CalledProcessError as e:
         logger.error(e.stderr)
         raise e
+
+
+def transfer_file_from_message(message_content: str):
+    # format for message_content: '{"format": "su-oseberg", "path": "oseberg/2021/2/11/514993.ccs.segy"}'
+    # convert str to dict
+    try:
+        msg: dict = json.loads(message_content)
+    except:
+        raise Exception("ERROR: message content from queue not in dictionary format")
+
+    #todo: download file + transfer file
+    pass
