@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, validator
 
@@ -6,10 +6,6 @@ from settings import FieldStorageContainers
 
 
 class EventData(BaseModel):
-    """
-    My Cool model
-    """
-
     api: str
     contentType: str
     contentLength: int
@@ -21,6 +17,8 @@ class EventData(BaseModel):
     # https://pydantic-docs.helpmanual.io/usage/validators/
     @validator("field", always=True)
     def validate_field(cls, value, values):
+        if not values.get("url"):
+            raise ValueError
         return cls.field_from_url(values["url"])
 
     @staticmethod
@@ -35,10 +33,16 @@ class EventData(BaseModel):
         raise ValueError("Failed to extract container/field from event url'")
 
 
+class SubscriptionValidation(BaseModel):
+    validationCode: str
+    validationUrl: str
+
+
 class Event(BaseModel):
     topic: str
     subject: str
     eventType: str
     eventTime: str
     id: str
-    data: EventData
+    # Pydantic will pick the first type that matches
+    data: Union[EventData, SubscriptionValidation]

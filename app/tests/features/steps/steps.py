@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -19,7 +20,7 @@ def step_impl1(context):
 def step_impl2(context):
     event = Event.parse_raw(context.text)
     context.event = event
-    events([event])
+    context.response = events([event])
 
 
 @then("the decimated file gets uploaded")
@@ -30,10 +31,11 @@ def step_impl3(context):
     assert az_files_service.file_exists(f"{event.data.field}/{date_path}/514992.ccs.segy")
 
 
-@then("added to the queues")
+@then("the response will be")
 def step_impl4(context):
-    # TODO: Can't request specific message. Do something smart
-    pass
+    expected = json.loads(context.text)
+    actual = context.response
+    assert expected == actual
 
 
 @given("an empty stream-queue")
