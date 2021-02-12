@@ -36,11 +36,11 @@ class Database:
         return cursor.lastrowid
 
     def update(self, file: StreamFile):
-        sql = f''' UPDATE {self.DB_TABLE}
+        sql = f""" UPDATE {self.DB_TABLE}
                   SET decimated = ? ,
                       transferred = ?,
                       decimated_path = ?
-                  WHERE path = ?'''
+                  WHERE path = ?"""
         cursor = self.connection.cursor()
         cursor.execute(sql, (file.decimated, file.transferred, file.decimated_path, file.path))
         self.connection.commit()
@@ -71,7 +71,9 @@ class Database:
 
     def all_unfinished(self) -> List[StreamFile]:
         cursor = self.connection.cursor()
-        cursor.execute(f"SELECT * FROM {self.DB_TABLE} WHERE transferred=FALSE", )
+        cursor.execute(
+            f"SELECT * FROM {self.DB_TABLE} WHERE transferred=FALSE",
+        )
 
         rows = cursor.fetchall()
 

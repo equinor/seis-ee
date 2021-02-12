@@ -1,5 +1,6 @@
-import subprocess
+import subprocess  # nosec
 import json
+
 from pathlib import Path
 
 from settings import settings
@@ -7,8 +8,13 @@ from utils import logger
 
 def ensure_remote_path(path: str):
     try:
-        subprocess.run(args=f"ssh {settings.STREAM_TARGET_USER}@{settings.STREAM_TARGET_HOST} mkdir -p {path}",
-                       shell=True, check=True, capture_output=True, encoding="UTF-8")
+        subprocess.run(
+            args=f"ssh {settings.STREAM_TARGET_USER}@{settings.STREAM_TARGET_HOST} mkdir -p {path}",
+            shell=True,
+            check=True,
+            capture_output=True,
+            encoding="UTF-8",
+        )
     except subprocess.CalledProcessError as e:
         logger.error(e.stderr)
         raise e
@@ -22,7 +28,11 @@ def transfer_file(target: str):
     try:
         subprocess.run(
             args=f"rsync -vA {target} {settings.STREAM_TARGET_USER}@{settings.STREAM_TARGET_HOST}:{dest}",
-            shell=True, check=True, capture_output=True, encoding="UTF-8")
+            shell=True,
+            check=True,
+            capture_output=True,
+            encoding="UTF-8",
+        )
     except subprocess.CalledProcessError as e:
         logger.error(e.stderr)
         raise e

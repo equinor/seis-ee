@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
