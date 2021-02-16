@@ -1,8 +1,7 @@
 import logging
 from datetime import datetime
 from functools import wraps
-
-import click
+from pathlib import Path
 
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
@@ -18,12 +17,6 @@ az_logger = logging.getLogger("azure.core.pipeline.policies.http_logging_policy"
 az_logger.setLevel(logging.WARNING)
 
 
-def print_help_and_exit():
-    ctx = click.get_current_context()
-    print(ctx.get_help())
-    exit(1)
-
-
 def timeit(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -34,3 +27,10 @@ def timeit(f):
         return result
 
     return wrap
+
+
+def delete_file(path: str):
+    try:
+        Path(path).unlink()
+    except FileNotFoundError:
+        logger.error(f"FileNotFoundError: Failed to delete file: '{path}'")

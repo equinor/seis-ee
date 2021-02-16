@@ -11,7 +11,7 @@ class EventData(BaseModel):
     contentLength: int
     blobType: str
     url: str
-    field: Optional[str]
+    field: Optional[FieldStorageContainers]
 
     # Pydantic stuff to have a derived value
     # https://pydantic-docs.helpmanual.io/usage/validators/
@@ -24,12 +24,12 @@ class EventData(BaseModel):
     @staticmethod
     def field_from_url(url):
         container = url.split("/")[3]
-        if container.upper() == FieldStorageContainers.OSEBERG.value:
-            return FieldStorageContainers.OSEBERG.value
-        if container.upper() == FieldStorageContainers.GRANE.value:
-            return FieldStorageContainers.GRANE.value
-        if container.upper() == FieldStorageContainers.SNORRE.value:
-            return FieldStorageContainers.SNORRE.value
+        if container == FieldStorageContainers.OSEBERG.value:
+            return FieldStorageContainers.OSEBERG
+        if container == FieldStorageContainers.GRANE.value:
+            return FieldStorageContainers.GRANE
+        if container == FieldStorageContainers.SNORRE.value:
+            return FieldStorageContainers.SNORRE
         raise ValueError("Failed to extract container/field from event url'")
 
 

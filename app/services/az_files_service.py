@@ -10,7 +10,7 @@ from utils import logger
 class AzFilesService:
     def __init__(self):
         self.conn_str = settings.FILES_CONN_STRING
-        self.share = settings.FILES_SHARE
+        self.share = f"{settings.ENVIRONMENT}-{settings.FILES_SHARE}"
         self.client = ShareServiceClient.from_connection_string(self.conn_str)
         try:
             self.share_client = ShareClient.from_connection_string(self.conn_str, self.share)

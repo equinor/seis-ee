@@ -44,6 +44,6 @@ repos:
       language: system
     - id: bdd-tests
       name: Behave Tests
-      entry: sh -c "docker-compose build && docker-compose run seis_ee behave"
+      entry: sh -c "docker-compose build && docker-compose run seis_ee behave --tags=-skip"
       language: system
       pass_filenames: false

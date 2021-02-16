@@ -7,13 +7,24 @@ from behave import given, when, then, step
 from classes.event import Event
 from event_listener import events
 from services.az_files_service import az_files_service
-from services.blob_service import blob_service
+from services.blob_service import BlobService
 from services.queue_service import convert_queue, stream_queue
+from settings import FieldStorageContainers
 
 
-@given("there are files in the blob storage")
-def step_impl1(context):
-    blob_service.upload_blob(str(Path("test_data/oseberg/514992.su").absolute()))
+@given("there are OSEBERG files in the blob storage")
+def test_data_oseberg(context):
+    BlobService(FieldStorageContainers.OSEBERG).upload_blob(str(Path("test_data/oseberg/oseberg-test.su").absolute()))
+
+
+@given("there are GRANE files in the blob storage")
+def test_data_grane(context):
+    BlobService(FieldStorageContainers.GRANE).upload_blob(str(Path("test_data/grane/grane-test.sgd").absolute()))
+
+
+@given("there are SNORRE files in the blob storage")
+def test_data_snorre(context):
+    BlobService(FieldStorageContainers.SNORRE).upload_blob(str(Path("test_data/snorre/snorre-test.sgd").absolute()))
 
 
 @when("an event is posted")
@@ -23,12 +34,12 @@ def step_impl2(context):
     context.response = events([event])
 
 
-@then("the decimated file gets uploaded")
-def step_impl3(context):
+@then('the decimated file "{filename}" gets uploaded')
+def step_impl3(context, filename):
     event: Event = context.event
     date = datetime.now()
     date_path = f"{date.year}/{date.month}/{date.day}"
-    assert az_files_service.file_exists(f"{event.data.field}/{date_path}/514992.ccs.segy")
+    assert az_files_service.file_exists(f"{event.data.field.value}/{date_path}/{filename}")
 
 
 @then("the response will be")
