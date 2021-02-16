@@ -85,6 +85,12 @@ def validate_event(event: Event):
 def events(event_list: List[Event]):
     results = []
     for event in event_list:
+        # TODO: Verify with shared secret
+
+        # Handle Validation requests first
+        if event.eventType == "Microsoft.EventGrid.SubscriptionValidationEvent":
+            return {"validationResponse": event.data.validationCode}
+
         if not validate_event(event):
             logger.warning("Invalid event posted. Reason: Wrong storage account or container")
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid event posted")

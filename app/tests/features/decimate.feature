@@ -30,4 +30,3 @@ Feature: Download, decimate, and upload on event trigger
     }
     """
     Then the decimated file gets uploaded
-    And added to the queues
