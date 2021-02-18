@@ -17,7 +17,6 @@ repos:
   rev: 3.8.4
   hooks:
     - id: flake8
-      # args: ['--config=.flake8']
       language_version: python3.8
 
 - repo: https://github.com/ambv/black
@@ -37,13 +36,18 @@ repos:
 
 - repo: local
   hooks:
-    - id: unit-tests
+    - id: build
+      name: Docker Build
+      entry: sh -c "docker-compose build seis_ee"
+      pass_filenames: false
+      language: system
+    - id: unittests
       name: Unit Tests
-      entry: sh -c "echo 'Here I will add my unit tests... IF I HAD ANY!' && exit 0"
+      entry: sh -c "docker-compose run seis_ee pytest -v  --no-header"
       pass_filenames: false
       language: system
     - id: bdd-tests
       name: Behave Tests
-      entry: sh -c "docker-compose build && docker-compose run seis_ee behave --tags=-skip"
+      entry: sh -c "docker-compose run seis_ee behave --tags=-skip"
       language: system
       pass_filenames: false

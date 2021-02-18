@@ -14,13 +14,22 @@ def call_decimate(file_path: str, destination: str, conf: Dict):
 
     try:
         logger.info(f"Decimating {file_path}...")
-        # TODO: Secure against Command Injection - see: https://owasp.org/www-community/attacks/Command_Injection
-        decimate_process = subprocess.run(  # noqa
-            args=f"decimate -y --rotate=false --ignore-missing --dst {destination} --confstring '{json.dumps(conf)}' {file_path}",  # noqa
-            shell=True,  # noqa
+        decimate_process = subprocess.run(
+            args=[
+                "decimate",
+                "-y",
+                "--rotate=false",
+                "--ignore-missing",
+                "--dst",
+                destination,
+                "--confstring",
+                json.dumps(conf),
+                file_path,
+            ],
             check=True,
             capture_output=True,
             encoding="UTF-8",
+            shell=False,  # nosec
         )
         logger.info(decimate_process.stderr)
     except subprocess.CalledProcessError as e:

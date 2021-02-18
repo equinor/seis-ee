@@ -1,5 +1,6 @@
 FROM registry.git.equinor.com/sentry/decimate:latest
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 RUN useradd  --uid 1000 --user-group seis
 

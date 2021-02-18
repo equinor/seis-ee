@@ -1,14 +1,16 @@
 from typing import List
 
 import uvicorn
+from azure.core.exceptions import ResourceNotFoundError
 from fastapi import FastAPI, HTTPException, status
 
 from classes.event import Event
+from classes.stream_file import StreamFile
+from exceptions import BadInputException
 from services.az_files_service import az_files_service
 from services.blob_service import BlobService
 from services.queue_service import convert_queue, stream_queue
 from settings import FieldStorageContainers, settings
-from classes.stream_file import StreamFile
 from utils import delete_file, logger
 
 app = FastAPI()
@@ -16,10 +18,9 @@ app = FastAPI()
 
 def handle_new_blob_event(event: Event):
     format = event.data.field
-    filename = event.data.url.split("/", 4)[4]
 
     # Download the raw file from the common BlobStorage
-    filepath = BlobService(event.data.field).download_blob(filename)
+    filepath = BlobService(event.data.field).download_blob(event.data.filepath)
     file = StreamFile(filepath, format)
 
     # Decimate the file
@@ -67,7 +68,18 @@ def events(event_list: List[Event]):
             logger.warning("Invalid event posted. Reason: Wrong storage account or container")
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid event posted")
 
-        results.append(handle_new_blob_event(event))
+        try:
+            results.append(handle_new_blob_event(event))
+        except BadInputException as e:
+            logger.warning(e)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid event posted")
+        except ResourceNotFoundError as e:
+            logger.warning(e)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.warning("Something went wrong somewhere...\nA more specific exception should be caught")
+            logger.exception(e)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid event posted")
     return results
 
 

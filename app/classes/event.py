@@ -1,8 +1,10 @@
 from typing import Optional, Union
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, PydanticValueError, validator
 
+from exceptions import BadInputException
 from settings import FieldStorageContainers
+from utils import sanitize_shell_arguments
 
 
 class EventData(BaseModel):
@@ -11,6 +13,7 @@ class EventData(BaseModel):
     contentLength: int
     blobType: str
     url: str
+    filepath: Optional[str]
     field: Optional[FieldStorageContainers]
 
     # Pydantic stuff to have a derived value
@@ -20,6 +23,16 @@ class EventData(BaseModel):
         if not values.get("url"):
             raise ValueError
         return cls.field_from_url(values["url"])
+
+    @validator("filepath", always=True)
+    def validate_filepath(cls, value, values):
+        if not values.get("url"):
+            raise ValueError
+        filename = values["url"].split("/", 4)[4]
+        try:
+            return sanitize_shell_arguments(filename)
+        except BadInputException as e:
+            raise PydanticValueError(msg_template=e.message)
 
     @staticmethod
     def field_from_url(url):
