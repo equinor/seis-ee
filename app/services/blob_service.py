@@ -1,10 +1,8 @@
 import os
 from pathlib import Path
 
-from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
-from azure.storage.blob import BlobServiceClient, BlobClient
-from fastapi import HTTPException
-from starlette import status
+from azure.core.exceptions import ResourceExistsError
+from azure.storage.blob import BlobClient, BlobServiceClient
 
 from settings import FieldStorageContainers, settings
 from utils import logger
@@ -32,12 +30,6 @@ class BlobService:
         dirs = filename.replace(Path(filename).name, "")
         Path(f"{settings.TMP_BLOB_DIR}/{dirs}").mkdir(parents=True, exist_ok=True)
         with open(f"{settings.TMP_BLOB_DIR}/{filename}", "wb") as blob_file:
-            try:
-                raw = self.blob_client(filename).download_blob().readall()
-                blob_file.write(raw)
-            except ResourceNotFoundError as error:
-                logger.warning(error)
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail=f"Requested Blob not found('{filename}')"
-                )
+            raw = self.blob_client(filename).download_blob().readall()
+            blob_file.write(raw)
         return str(Path(f"{settings.TMP_BLOB_DIR}/{filename}").absolute())

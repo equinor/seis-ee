@@ -1,7 +1,11 @@
 import logging
+import re
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from shlex import quote
+
+from exceptions import BadInputException
 
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
@@ -34,3 +38,14 @@ def delete_file(path: str):
         Path(path).unlink()
     except FileNotFoundError:
         logger.error(f"FileNotFoundError: Failed to delete file: '{path}'")
+
+
+regex = r"[^a-zA-Z0-9\/\_\-\.]"
+pattern = re.compile(regex)
+
+
+def sanitize_shell_arguments(in_arg: str) -> str:
+    match = re.search(pattern, in_arg)
+    if match:
+        raise BadInputException(f"The string {in_arg} contains invalid characters [{match.group()}]")
+    return quote(in_arg)

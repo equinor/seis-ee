@@ -35,15 +35,20 @@ repos:
       args: [-l, --recursive, -x, tests]
       files: ^app/.*\.py$
 
-- repo: local
-  hooks:
-    - id: unit-tests
-      name: Unit Tests
-      entry: sh -c "echo 'Here I will add my unit tests... IF I HAD ANY!' && exit 0"
-      pass_filenames: false
-      language: system
-    # - id: bdd-tests
-    #   name: Behave Tests
-    #   entry: sh -c "docker-compose build && docker-compose run seis_ee behave --tags=-skip"
-    #   language: system
-    #   pass_filenames: false
+#- repo: local
+#  hooks:
+#    - id: build
+#      name: Docker Build
+#      entry: sh -c "docker-compose build seis_ee"
+#      pass_filenames: false
+#      language: system
+#    - id: unittests
+#      name: Unit Tests
+#      entry: sh -c "docker-compose run seis_ee pytest -v  --no-header"
+#      pass_filenames: false
+#      language: system
+#    - id: bdd-tests
+#      name: Behave Tests
+#      entry: sh -c "docker-compose run seis_ee behave --tags=-skip"
+#      language: system
+#      pass_filenames: false
