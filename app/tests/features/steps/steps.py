@@ -13,7 +13,6 @@ from settings import FieldStorageContainers
 from azure.storage.queue import QueueMessage
 from mseed_converter import convert_to_mseed
 
-
 @given("there are OSEBERG files in the blob storage")
 def test_data_oseberg(context):
     BlobService(FieldStorageContainers.OSEBERG).upload_blob(str(Path("test_data/oseberg/oseberg-test.su").absolute()))
@@ -74,17 +73,16 @@ def step_impl8(context):
     assert stream_msg
     assert convert_msg
 
+@then("add message to convert-queue {format} and {path}")
+def add_msg_to_convert_queue(context, format, path):
+    convert_queue.send_message({"format": format.replace("\"", ""), "path": path.replace("\"", "")})
 
-@then("run mseed conversion from command line")
-def step_impl(context):
+@then("the file {file} has been created in {target_dir}")
+def step_impl(context, file, target_dir):
     convert_msg: QueueMessage = convert_queue.fetch_message()
     message_content: dict = json.loads(convert_msg.content)
-    azure_storage_decimated_file_path: str = ""
-    file_format: str = "";
-    for key, value in message_content.items():
-        if (key == "path"):
-            azure_storage_decimated_file_path = value
-        if (key == "format"):
-            file_format = value
-    assert azure_storage_decimated_file_path != "" and file_format != ""
+    azure_storage_decimated_file_path: str = message_content["path"]
+    file_format: str = message_content["format"]
     convert_to_mseed(azure_storage_decimated_file_path, file_format)
+
+    # todo add an assert to check if file has been created - when mseed converter is finished

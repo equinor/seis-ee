@@ -5,7 +5,7 @@ ENV PYTHONPATH=/app
 RUN useradd  --uid 1000 --user-group seis
 
 # Install python/pip
-RUN apt-get update -y && apt-get install -y python3 wget python3-distutils python3-apt ssh rsync
+RUN apt-get update -y && apt-get install -y python3 wget python3-distutils python3-apt ssh rsync g++
 RUN python3 --version
 RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
 RUN pip install poetry
@@ -15,10 +15,8 @@ RUN poetry config virtualenvs.create false
 
 #build c++ program
 # todo perhaps move this to separate docker-compose service or something??
-RUN mkdir /mseed-app
-ADD /mseed_converter /mseed-app
-RUN apt-get install -y g++
 WORKDIR /mseed-app
+ADD /mseed_converter /mseed-app
 RUN g++ -g -o main main.cpp
 
 WORKDIR /app/

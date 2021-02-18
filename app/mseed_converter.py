@@ -9,7 +9,7 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     #download from azure file storage to local storage
     local_file_path: str = az_files_service.download_file(azure_storage_decimated_file_path)
 
-    if (file_format == FieldStorageContainers.GRANE.value or file_format == FieldStorageContainers.SNORRE.value or file_format == FieldStorageContainers.OSEBERG.value):
+    if (file_format in [item.value for item in FieldStorageContainers]):
         cli_parameters: str = f"{local_file_path} {output_file_path}"
     else:
         raise Exception("Wrong file format")
@@ -30,3 +30,4 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
         raise Exception(e.stderr)
+
