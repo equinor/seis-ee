@@ -10,6 +10,8 @@ from services.az_files_service import az_files_service
 from services.blob_service import BlobService
 from services.queue_service import convert_queue, stream_queue
 from settings import FieldStorageContainers
+from azure.storage.queue import QueueMessage
+from mseed_converter import convert_to_mseed
 
 
 @given("there are OSEBERG files in the blob storage")
@@ -71,3 +73,18 @@ def step_impl8(context):
     convert_msg = convert_queue.fetch_message()
     assert stream_msg
     assert convert_msg
+
+
+@then("run mseed conversion from command line")
+def step_impl(context):
+    convert_msg: QueueMessage = convert_queue.fetch_message()
+    message_content: dict = json.loads(convert_msg.content)
+    azure_storage_decimated_file_path: str = ""
+    file_format: str = "";
+    for key, value in message_content.items():
+        if (key == "path"):
+            azure_storage_decimated_file_path = value
+        if (key == "format"):
+            file_format = value
+    assert azure_storage_decimated_file_path != "" and file_format != ""
+    convert_to_mseed(azure_storage_decimated_file_path, file_format)

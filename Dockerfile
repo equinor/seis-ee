@@ -11,6 +11,16 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py
 RUN pip install poetry
 
 RUN poetry config virtualenvs.create false
+
+
+#build c++ program
+# todo perhaps move this to separate docker-compose service or something??
+RUN mkdir /mseed-app
+ADD /mseed_converter /mseed-app
+RUN apt-get install -y g++
+WORKDIR /mseed-app
+RUN g++ -g -o main main.cpp
+
 WORKDIR /app/
 COPY pyproject.toml poetry.lock ./
 RUN poetry install

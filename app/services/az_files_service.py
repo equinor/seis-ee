@@ -44,6 +44,29 @@ class AzFilesService:
 
         return name_to_upload_as
 
+    def download_file(self, azure_storage_path_to_file: str):
+        try:
+            local_file_path = "data/" + azure_storage_path_to_file
+
+            # Create a ShareFileClient from a connection string
+            file_client = ShareFileClient.from_connection_string(
+                self.conn_str, self.share, local_file_path)
+
+            logger.info(f"Downloading file from azure storage to local folder")
+
+            # Open a file for writing bytes on the local system
+            with open(local_file_path, "wb") as data:
+                # Download the file from Azure into a stream
+                stream = file_client.download_file()
+                # Write the stream to the local file
+                data.write(stream.readall())
+
+        except ResourceNotFoundError as ex:
+            logger.info("ResourceNotFoundError:", ex.message)
+
+        return local_file_path
+
+
     def file_exists(self, path: str) -> bool:
         try:
             file_client = ShareFileClient.from_connection_string(self.conn_str, self.share, path)
