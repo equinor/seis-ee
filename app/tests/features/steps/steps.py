@@ -73,7 +73,7 @@ def step_impl8(context):
     assert stream_msg
     assert convert_msg
 
-@then("add message to convert-queue {format} and {path}")
+@then("add message to convert-queue with format {format} and path {path}")
 def add_msg_to_convert_queue(context, format, path):
     convert_queue.send_message({"format": format.replace("\"", ""), "path": path.replace("\"", "")})
 
