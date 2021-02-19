@@ -13,6 +13,7 @@ from settings import FieldStorageContainers
 from azure.storage.queue import QueueMessage
 from mseed_converter import convert_to_mseed
 
+
 @given("there are OSEBERG files in the blob storage")
 def test_data_oseberg(context):
     BlobService(FieldStorageContainers.OSEBERG).upload_blob(str(Path("test_data/oseberg/oseberg-test.su").absolute()))
@@ -73,9 +74,11 @@ def step_impl8(context):
     assert stream_msg
     assert convert_msg
 
+
 @then("add message to convert-queue with format {format} and path {path}")
 def add_msg_to_convert_queue(context, format, path):
-    convert_queue.send_message({"format": format.replace("\"", ""), "path": path.replace("\"", "")})
+    convert_queue.send_message({"format": format.replace('"', ""), "path": path.replace('"', "")})
+
 
 @then("the file {file} has been created in {target_dir}")
 def step_impl(context, file, target_dir):
