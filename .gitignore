@@ -9,3 +9,4 @@
 .vscode
 /app/data/
 /app/test_data/
+.pytest_cache
