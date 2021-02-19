@@ -26,4 +26,5 @@ RUN poetry install
 ADD app /app/
 RUN chown -R seis:seis /app
 USER seis
+RUN chmod u+x /app/init.sh
 ENTRYPOINT /app/init.sh

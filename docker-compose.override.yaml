@@ -1,20 +1,20 @@
 version: "3.4"
 
-services:
-  seis_ee:
-    environment:
-      environment: dev
-      BLOB_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage-emulator:10000/devstoreaccount1;"
-      FILES_CONN_STRING: ${FILES_CONN_STRING}
-      QUEUE_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://storage-emulator:10001/devstoreaccount1;"
-    depends_on:
-      - storage-emulator
+#services:
+#  seis_ee:
+#    environment:
+#      environment: dev
+#      BLOB_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage-emulator:10000/devstoreaccount1;"
+#      FILES_CONN_STRING: ${FILES_CONN_STRING}
+#      QUEUE_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://storage-emulator:10001/devstoreaccount1;"
+#    depends_on:
+#      - storage-emulator#
 
-  storage-emulator:
-    image: mcr.microsoft.com/azure-storage/azurite
-    volumes:
-      - "./data/storageBlobs:/data"
-    ports:
-      - "10000:10000"
-      - "10001:10001"
-    command: ["azurite","--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--loose", "--location", "/data"]
+#  storage-emulator:
+#    image: mcr.microsoft.com/azure-storage/azurite
+#    volumes:
+#      - "./data/storageBlobs:/data"
+#    ports:
+#      - "10000:10000"
+#      - "10001:10001"
+#    command: ["azurite","--blobHost", "0.0.0.0", "--queueHost", "0.0.0.0", "--loose", "--location", "/data"]

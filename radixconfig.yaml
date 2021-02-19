@@ -9,7 +9,7 @@ spec:
         from: master
   components:
     - name: decimator
-      image: ghcr.io/equinor/css-passive
+      image: ghcr.io/equinor/ccs-passive
       alwaysPullImageOnDeploy: true
       variables:
         ENVIRONMENT: prod
@@ -27,28 +27,29 @@ spec:
         - QUEUE_CONN_STRING
 
     - name: converter
-      image: ghcr.io/equinor/css-passive
+      image: ghcr.io/equinor/ccs-passive
       alwaysPullImageOnDeploy: true
       variables:
         ENVIRONMENT: prod
-        RUN_MODE: decimator
+        RUN_MODE: converter
       secrets:
         - FILES_CONN_STRING
         - QUEUE_CONN_STRING
 
-    - name: streamer
-      image: ghcr.io/equinor/css-passive
-      alwaysPullImageOnDeploy: true
-      variables:
-        ENVIRONMENT: prod
-        RUN_MODE: decimator
-        STREAM_TARGET_USER: seis
-        STREAM_TARGET_HOST: 192.168.1.5
-        STREAM_TARGET_DIR: /data/css
-      secrets:
-        - FILES_CONN_STRING
-        - QUEUE_CONN_STRING
-        - SSH_PRIVATE_KEY
+
+    # - name: streamer
+    #  image: ghcr.io/equinor/ccs-passive
+    #  alwaysPullImageOnDeploy: true
+    #  variables:
+    #    ENVIRONMENT: prod
+    #    RUN_MODE: decimator
+    #    STREAM_TARGET_USER: seis
+    #    STREAM_TARGET_HOST: 192.168.1.5
+    #    STREAM_TARGET_DIR: /data/ccs
+    #  secrets:
+    #    - FILES_CONN_STRING
+    #    - QUEUE_CONN_STRING
+    #    - SSH_PRIVATE_KEY
 
   dnsAppAlias:
     environment: prod
