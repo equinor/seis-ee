@@ -32,6 +32,9 @@ spec:
       variables:
         ENVIRONMENT: prod
         RUN_MODE: converter
+      ports:
+        - name: http
+          port: 5001
       secrets:
         - FILES_CONN_STRING
         - QUEUE_CONN_STRING
