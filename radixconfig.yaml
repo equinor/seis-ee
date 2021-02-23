@@ -1,0 +1,49 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: ccs-passive
+spec:
+  environments:
+    - name: test-radix-deploy
+      build:
+        from: radix-deploy
+  components:
+    - name: decimator
+      image: ghcr.io/equinor/ccs-passive
+      alwaysPullImageOnDeploy: true
+      variables:
+        ENVIRONMENT: prod
+        RUN_MODE: decimator
+        GRANE_SENSORS: [1, 2, 3, 5]
+        OSEBERG_SENSORS: [12, 21]
+        SNORRE_SENSORS: [1, 2, 3, 5]
+      ports:
+        - name: http
+          port: 5000
+      publicPort: http
+      secrets:
+        - BLOB_CONN_STRING
+        - FILES_CONN_STRING
+        - QUEUE_CONN_STRING
+
+    - name: converter
+      image: ghcr.io/equinor/ccs-passive
+      alwaysPullImageOnDeploy: true
+      variables:
+        ENVIRONMENT: prod
+        RUN_MODE: converter
+      ports:
+        - name: http
+          port: 5001
+      secrets:
+        - FILES_CONN_STRING
+        - QUEUE_CONN_STRING
+  privateImageHubs:
+    ghcr.io:
+      username: KristianKjerstad
+      email: kristian.kjerstad@bouvet.no
+
+
+  dnsAppAlias:
+    environment: test-radix-deploy
+    component: decimator

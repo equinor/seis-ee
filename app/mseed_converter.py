@@ -2,6 +2,10 @@ from utils import logger
 import subprocess  # nosec
 from settings import FieldStorageContainers
 from services.az_files_service import az_files_service
+from services.queue_service import convert_queue
+from azure.storage.queue import QueueMessage
+import time
+import json
 
 
 def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
@@ -31,3 +35,24 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
         raise Exception(e.stderr)
+
+
+def poll_convert_queue():
+    logger.info("started polling convert queue ...")
+    SLEEP_TIME = 10
+    msg: QueueMessage
+    while True:
+        msg = convert_queue.fetch_message()
+        if msg:
+            logger.info(f"new msg arrived in convert queue! {msg}")
+            message_content = json.loads(msg.content)
+            azure_storage_decimated_file_path = message_content["path"]
+            file_format = message_content["format"]
+            convert_to_mseed(azure_storage_decimated_file_path, file_format)
+            convert_queue.delete_message(msg)
+        else:
+            time.sleep(SLEEP_TIME)
+
+
+if __name__ == "__main__":
+    poll_convert_queue()

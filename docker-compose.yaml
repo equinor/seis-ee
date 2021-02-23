@@ -1,12 +1,28 @@
 version: "3.4"
 services:
-  seis_ee:
-    image: seis-ee
+  decimator:
+    image: ghcr.io/equinor/ccs-passive
     build: .
     ports:
       - "80:5000"
     environment:
       FILES_CONN_STRING: ${FILES_CONN_STRING}
+      BLOB_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://storage-emulator:10000/devstoreaccount1;"
+      QUEUE_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://storage-emulator:10001/devstoreaccount1;"
+      RUN_MODE: decimator
     volumes:
       - ./data:/app/data
-    command: python3 /app/event_listener.py
+    depends_on:
+      - storage-emulator
+
+  converter:
+    image: ghcr.io/equinor/ccs-passive
+    build: .
+    environment:
+      FILES_CONN_STRING: ${FILES_CONN_STRING}
+      QUEUE_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://storage-emulator:10001/devstoreaccount1;"
+      RUN_MODE: converter
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - storage-emulator
