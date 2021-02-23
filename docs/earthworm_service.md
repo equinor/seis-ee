@@ -4,7 +4,7 @@ Short description on how the Earthworm service is configured, with some useful c
 
 ## Systemd
 
-To make sure earthworm restarts on system reboot, it's is setup as a systemd service.  
+To make sure earthworm restarts on system reboot, it's setup as a systemd service.  
 The service file is located at `/etc/systemd/system/earthworm.service` and looks like this;
 
 ```toml
