@@ -39,6 +39,7 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
 
 def poll_convert_queue():
     logger.info("started polling convert queue ...")
+    SLEEP_TIME = 10
     msg: QueueMessage
     while True:
         msg = convert_queue.fetch_message()
@@ -48,9 +49,9 @@ def poll_convert_queue():
             azure_storage_decimated_file_path = message_content["path"]
             file_format = message_content["format"]
             convert_to_mseed(azure_storage_decimated_file_path, file_format)
-            convert_queue.delete_message((msg))
-
-        time.sleep(1)
+            convert_queue.delete_message(msg)
+        else:
+            time.sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,6 @@
 set -e
 
 RUN_MODE=${RUN_MODE:="decimator"}
-echo "$@"
 if [ "$1" = "start" ]; then
   if [ "$RUN_MODE" = "decimator" ]; then
       python3 /app/event_listener.py

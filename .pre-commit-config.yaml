@@ -48,6 +48,6 @@ repos:
       language: system
     - id: bdd-tests
       name: Behave Tests
-      entry: sh -c "docker-compose run -e RUN_MODE="" decimator behave --tags=-skip"
+      entry: sh -c "docker-compose run decimator behave --tags=-skip"
       language: system
       pass_filenames: false
