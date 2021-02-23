@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -euo
+set -e
 
 RUN_MODE=${RUN_MODE:="decimator"}
 echo "$@"
