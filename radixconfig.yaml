@@ -4,9 +4,9 @@ metadata:
   name: ccs-passive
 spec:
   environments:
-    - name: prod
+    - name: test-radix-deploy
       build:
-        from: master
+        from: radix-deploy
   components:
     - name: decimator
       image: ghcr.io/equinor/ccs-passive
@@ -35,21 +35,11 @@ spec:
       secrets:
         - FILES_CONN_STRING
         - QUEUE_CONN_STRING
+  privateImageHubs:
+    ghcr.io/equinor:
+      username: KristianKjerstad
+      email: kristian.kjerstad@bouvet.no
 
-
-    # - name: streamer
-    #  image: ghcr.io/equinor/ccs-passive
-    #  alwaysPullImageOnDeploy: true
-    #  variables:
-    #    ENVIRONMENT: prod
-    #    RUN_MODE: decimator
-    #    STREAM_TARGET_USER: seis
-    #    STREAM_TARGET_HOST: 192.168.1.5
-    #    STREAM_TARGET_DIR: /data/ccs
-    #  secrets:
-    #    - FILES_CONN_STRING
-    #    - QUEUE_CONN_STRING
-    #    - SSH_PRIVATE_KEY
 
   dnsAppAlias:
     environment: prod
