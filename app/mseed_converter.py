@@ -5,6 +5,7 @@ from services.az_files_service import az_files_service
 from services.queue_service import convert_queue
 from azure.storage.queue import QueueMessage
 import time
+import json
 
 def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     output_file_path: str = "/data/mseed/" + azure_storage_decimated_file_path
@@ -43,7 +44,10 @@ def poll_convert_queue():
         msg = convert_queue.fetch_message()
         if msg:
             logger.info(f"new msg arrived in convert queue! {msg}")
-            # todo : run mseed conterter program
+            message_content = json.loads(msg.content)
+            azure_storage_decimated_file_path = message_content["path"]
+            file_format = message_content["format"]
+            convert_to_mseed(azure_storage_decimated_file_path, file_format)
             convert_queue.delete_message((msg))
 
         time.sleep(1)
