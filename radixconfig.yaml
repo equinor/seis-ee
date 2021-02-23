@@ -39,7 +39,7 @@ spec:
         - FILES_CONN_STRING
         - QUEUE_CONN_STRING
   privateImageHubs:
-    ghcr.io/equinor:
+    ghcr.io:
       username: KristianKjerstad
       email: kristian.kjerstad@bouvet.no
 
