@@ -45,5 +45,5 @@ spec:
 
 
   dnsAppAlias:
-    environment: prod
+    environment: test-radix-deploy
     component: decimator
