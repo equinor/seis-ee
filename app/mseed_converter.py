@@ -7,6 +7,7 @@ from azure.storage.queue import QueueMessage
 import time
 import json
 
+
 def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     output_file_path: str = "/data/mseed/" + azure_storage_decimated_file_path
 
@@ -34,7 +35,6 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
         raise Exception(e.stderr)
-
 
 
 def poll_convert_queue():
