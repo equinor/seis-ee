@@ -29,7 +29,7 @@ Environment=SYS_NAME=localhost
 WantedBy=multi-user.target
 ```
 
-If earthworm needs to be started or stopped, it can  be achived whith these commands __as root__
+If earthworm needs to be started or stopped, that can be achived with these commands __as root__
 
 ```bash
 systemctl start earthworm
@@ -39,7 +39,7 @@ systemctl restart earthworm
 
 If you make changes to the earthworm.service file, run `systemctl daemon-reload` to load the new config, and then restart the service with `systemctl restart earthworm`.
 
-To see if earthworm is running succsesfully or not, run;  
+To see if earthworm is running successfully or not, run;  
 
 ```bash
 earthworm@earthworm:~$ systemctl status earthworm
