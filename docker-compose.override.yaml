@@ -8,7 +8,7 @@ version: "3.4"
 #      FILES_CONN_STRING: ${FILES_CONN_STRING}
 #      QUEUE_CONN_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://storage-emulator:10001/devstoreaccount1;"
 #    depends_on:
-#      - storage-emulator#
+#      - storage-emulator
 
 #  storage-emulator:
 #    image: mcr.microsoft.com/azure-storage/azurite

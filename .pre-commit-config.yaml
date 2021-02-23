@@ -38,16 +38,16 @@ repos:
   hooks:
     - id: build
       name: Docker Build
-      entry: sh -c "docker-compose build seis_ee"
+      entry: sh -c "docker-compose build decimator"
       pass_filenames: false
       language: system
     - id: unittests
       name: Unit Tests
-      entry: sh -c "docker-compose run seis_ee pytest -v  --no-header"
+      entry: sh -c "docker-compose run decimator pytest -v  --no-header"
       pass_filenames: false
       language: system
     - id: bdd-tests
       name: Behave Tests
-      entry: sh -c "docker-compose run seis_ee behave --tags=-skip"
+      entry: sh -c "docker-compose run -e RUN_MODE="" decimator behave --tags=-skip"
       language: system
       pass_filenames: false
