@@ -1,5 +1,5 @@
 import json
-import os
+
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.queue import QueueClient, QueueMessage
 
