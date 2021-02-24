@@ -1,5 +1,5 @@
 ###RUN docker login registry.git.equinor.com/sentry/decimate -u ${{secrets.GITLAB_USERNAME}} -p ${{secrets.GITLAB_ACCESS_TOKEN}}
-RUN echo ${{ secrets.GITLAB_ACCESS_TOKEN }} | docker login example.com -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
+#RUN echo ${{ secrets.GITLAB_ACCESS_TOKEN }} | docker login example.com -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
 FROM registry.git.equinor.com/sentry/decimate:latest
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
