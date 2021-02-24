@@ -1,9 +1,9 @@
 from typing import List
-
+import os
 import uvicorn
 from azure.core.exceptions import ResourceNotFoundError
 from fastapi import FastAPI, HTTPException, status
-
+from dotenv import load_dotenv
 from classes.event import Event
 from classes.stream_file import StreamFile
 from exceptions import BadInputException
@@ -32,7 +32,6 @@ def handle_new_blob_event(event: Event):
     # Add new messages to the queues
     stream_queue.send_message({"format": format.value, "path": uploaded_path})
     convert_queue.send_message({"format": format.value, "path": uploaded_path})
-
     # Cleanup
     delete_file(filepath)
     delete_file(file.decimated_path)
@@ -43,9 +42,17 @@ def handle_new_blob_event(event: Event):
 def validate_event(event: Event):
     account = event.data.url.split("/")[2].split(".")[0]
     container = event.data.url.split("/")[3]
+
+    if (settings.ENVIRONMENT == "dev"):
+        storage_account = settings.STORAGE_ACCOUNT_DEV
+    elif (settings.ENVIRONMENT == "prod"):
+        storage_account = settings.STORAGE_ACCOUNT_PROD
+    else:
+        raise Exception("Could not read correct environment (dev or prod)")
+
     if (
         FieldStorageContainers[container.upper()].value != container
-        or account != settings.STORAGE_ACCOUNT
+        or account != storage_account
         or event.eventType != "Microsoft.Storage.BlobCreated"
         or event.data.blobType != "BlockBlob"
     ):

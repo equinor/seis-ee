@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import List
-
 from pydantic import BaseSettings
 
 
@@ -13,19 +12,12 @@ class FieldStorageContainers(Enum):
 # Pydantic config loading ref: https://fastapi.tiangolo.com/advanced/settings/
 # Will use env variables, and set default. Also parses complex data as json-strings
 class Settings(BaseSettings):
-    # Azurite default connection string
-    QUEUE_CONN_STRING: str = (
-        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-        "QueueEndpoint=http://localhost:10001/devstoreaccount1;"
-    )
-    BLOB_CONN_STRING: str = (
-        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-        "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-        "BlobEndpoint=http://localhost:10000/devstoreaccount1;"
-    )
     FILES_CONN_STRING: str
-    STORAGE_ACCOUNT: str = "devstoreaccount1"
+    BLOB_CONN_STRING: str
+    QUEUE_CONN_STRING: str
+    ENVIRONMENT: str
+    STORAGE_ACCOUNT_DEV: str = "devstoreaccount1"
+    STORAGE_ACCOUNT_PROD: str = "ccs"
     FILES_SHARE: str = "ccs-passive"
     DECIMATED_FILES_DEST: str = "decimated_files"
     STREAM_TARGET_USER: str = "kkje"
@@ -39,7 +31,6 @@ class Settings(BaseSettings):
     SNORRE_SAMPLE_RATE: int = 1250
     SNORRE_FILE_HEADER_SIZE: int = 192
     GRANE_FILE_HEADER_SIZE: int = 160
-    ENVIRONMENT: str = "dev"
 
     class Config:
         env_file = "../.env"
