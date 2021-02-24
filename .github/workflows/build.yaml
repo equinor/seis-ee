@@ -1,7 +1,7 @@
 name: Build & publish container image
 on:
   push:
-    branches: [fix-docker-image-access]
+    branches: [master]
 jobs:
   build_and_push:
     name: Push Docker image to GitHub Packages
