@@ -4,9 +4,9 @@ metadata:
   name: ccs-passive
 spec:
   environments:
-    - name: test-radix-deploy
+    - name: ccs-passive
       build:
-        from: radix-deploy
+        from: master
   components:
     - name: decimator
       image: ghcr.io/equinor/ccs-passive
@@ -45,5 +45,5 @@ spec:
 
 
   dnsAppAlias:
-    environment: test-radix-deploy
+    environment: ccs-passive
     component: decimator
