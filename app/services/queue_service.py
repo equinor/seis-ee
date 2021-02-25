@@ -31,5 +31,4 @@ class AzQueueService:
         self.client.clear_messages()
 
 
-stream_queue = AzQueueService("stream")
 convert_queue = AzQueueService("convert")

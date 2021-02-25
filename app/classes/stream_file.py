@@ -11,7 +11,6 @@ class StreamFile:
         self.format: FieldStorageContainers = format
         self.decimated_path: str = ""
 
-    # TODO: After decimation, upload result file to Azure Files and delete from disk.
     # TODO: This could perhaps be done async. ONLY IF we need the performance
     def decimate(self):
         # TODO  Check headers , event, now(), or something

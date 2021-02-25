@@ -25,6 +25,7 @@ spec:
         - BLOB_CONN_STRING
         - FILES_CONN_STRING
         - QUEUE_CONN_STRING
+        - EVENT_SECRET
 
     - name: converter
       image: ghcr.io/equinor/ccs-passive

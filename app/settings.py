@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     BLOB_CONN_STRING: str
     QUEUE_CONN_STRING: str
     ENVIRONMENT: str
+    EVENT_SECRET: str = "dummy"
     STORAGE_ACCOUNT: str = "devstoreaccount1" if os.getenv("ENVIRONMENT") == "dev" else "ccs"
     FILES_SHARE: str = "ccs-passive"
     DECIMATED_FILES_DEST: str = "decimated_files"
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     SNORRE_FILE_HEADER_SIZE: int = 192
     GRANE_FILE_HEADER_SIZE: int = 160
 
+    # This is just for local debugging. Environment variables should be injected via docker-compose/kubernetes
     class Config:
         env_file = "../.env"
         env_file_encoding = "utf-8"

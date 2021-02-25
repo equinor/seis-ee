@@ -37,13 +37,7 @@ def call_decimate(file_path: str, destination: str, conf: Dict):
         raise Exception(e.stderr)
 
 
-# TODO add the package segdpy with docker. Now, this package is installed manually...
-# if this package is not installed you cannot run decimate_grane
-# the segdpy package from github is installed locally by just
-# unzipping the python files to the local folder app / segdpy
 def decimate_grane(file_path: str, destination: str = settings.DECIMATED_FILES_DEST + "/grane"):
-    # TODO: Update when segdpy becomes OpenSource
-    # samples = number_of_samples_in_segd_file(file_path)
     conf = {
         "name": "ccs-grane",
         "format": "segd-grane",
