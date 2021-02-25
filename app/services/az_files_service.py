@@ -46,27 +46,24 @@ class AzFilesService:
         return name_to_upload_as
 
     def download_file(self, azure_storage_path_to_file: str):
-
-        local_file_full_path = "data/" + azure_storage_path_to_file
-        local_file_directory = local_file_full_path.rsplit("/", 1)[0]
+        if (settings.ENVIRONMENT == "prod"):
+            output_filename = "temp_file.sgy"
+        elif (settings.ENVIRONMENT == "dev"):
+            output_filename = "data/temp_file.sgy"
 
         # Create a ShareFileClient from a connection string
         file_client = ShareFileClient.from_connection_string(self.conn_str, self.share, azure_storage_path_to_file)
 
-        logger.info(f"Downloading file from azure storage to local folder {local_file_full_path}")
+        logger.info(f"Downloading file from azure storage to local file {output_filename}")
 
-        # create local directory if it does not exist
-        if not path.exists(local_file_directory):
-            Path(local_file_directory).mkdir(parents=True, exist_ok=True)
-
-        # Open a file for writing bytes on the local system
-        with open(local_file_full_path, "wb") as data:
+        # Open a file for writing bytes on the local system - will write over existing file
+        with open(output_filename, "wb") as data:
             # Download the file from Azure into a stream
             stream = file_client.download_file()
             # Write the stream to the local file
             data.write(stream.readall())
 
-        return local_file_full_path
+        return output_filename
 
     def file_exists(self, path: str) -> bool:
         try:
