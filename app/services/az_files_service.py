@@ -5,7 +5,7 @@ from azure.storage.fileshare import ShareClient, ShareDirectoryClient, ShareFile
 
 from settings import settings
 from utils import logger
-
+from os import path
 
 class AzFilesService:
     def __init__(self):
@@ -46,21 +46,26 @@ class AzFilesService:
 
     def download_file(self, azure_storage_path_to_file: str):
 
-        local_file_path = "data/" + azure_storage_path_to_file
+        local_file_full_path = "data/" + azure_storage_path_to_file
+        local_file_directory = local_file_full_path.rsplit('/', 1)[0]
 
         # Create a ShareFileClient from a connection string
         file_client = ShareFileClient.from_connection_string(self.conn_str, self.share, azure_storage_path_to_file)
 
-        logger.info(f"Downloading file from azure storage to local folder {local_file_path}")
+        logger.info(f"Downloading file from azure storage to local folder {local_file_full_path}")
+
+        #create local directory if it does not exist
+        if (path.exists(local_file_directory) == False):
+            Path(local_file_directory).mkdir(parents=True, exist_ok=True)
 
         # Open a file for writing bytes on the local system
-        with open(local_file_path, "wb") as data:
+        with open(local_file_full_path, "wb") as data:
             # Download the file from Azure into a stream
             stream = file_client.download_file()
             # Write the stream to the local file
             data.write(stream.readall())
 
-        return local_file_path
+        return local_file_full_path
 
     def file_exists(self, path: str) -> bool:
         try:
