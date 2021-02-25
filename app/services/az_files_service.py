@@ -46,9 +46,9 @@ class AzFilesService:
         return name_to_upload_as
 
     def download_file(self, azure_storage_path_to_file: str):
-        if (settings.ENVIRONMENT == "prod"):
+        if settings.ENVIRONMENT == "prod":
             output_filename = "temp_file.sgy"
-        elif (settings.ENVIRONMENT == "dev"):
+        elif settings.ENVIRONMENT == "dev":
             output_filename = "data/temp_file.sgy"
 
         # Create a ShareFileClient from a connection string
