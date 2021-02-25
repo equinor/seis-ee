@@ -56,7 +56,7 @@ class AzFilesService:
         logger.info(f"Downloading file from azure storage to local folder {local_file_full_path}")
 
         # create local directory if it does not exist
-        if path.exists(local_file_directory) == False:
+        if not path.exists(local_file_directory):
             Path(local_file_directory).mkdir(parents=True, exist_ok=True)
 
         # Open a file for writing bytes on the local system
