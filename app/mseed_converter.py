@@ -12,15 +12,15 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
     output_file_path: str = "/data/mseed/" + azure_storage_decimated_file_path
 
     # download from azure file storage to local storage
-    local_file_path: str = az_files_service.download_file(azure_storage_decimated_file_path)
+    local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
 
     if file_format in [item.value for item in FieldStorageContainers]:
-        cli_parameters: str = f"{local_file_path} {output_file_path}"
+        cli_parameters: str = f"{local_file} {output_file_path}"
     else:
         raise Exception("Wrong file format")
 
     try:
-        logger.info(f"converting file {local_file_path} to mseed ...")
+        logger.info(f"converting file {local_file} to mseed ...")
         # TODO: Secure against Command Injection
         # TODO: substitute the c++ program with the real mseed converter
         mseed_converter_process = subprocess.run(  # noqa
