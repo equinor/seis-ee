@@ -37,6 +37,7 @@ spec:
           port: 5001
       secrets:
         - FILES_CONN_STRING
+        - BLOB_CONN_STRING
         - QUEUE_CONN_STRING
   privateImageHubs:
     ghcr.io:

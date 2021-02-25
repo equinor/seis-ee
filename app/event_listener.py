@@ -32,7 +32,6 @@ def handle_new_blob_event(event: Event):
     # Add new messages to the queues
     stream_queue.send_message({"format": format.value, "path": uploaded_path})
     convert_queue.send_message({"format": format.value, "path": uploaded_path})
-
     # Cleanup
     delete_file(filepath)
     delete_file(file.decimated_path)
@@ -43,6 +42,7 @@ def handle_new_blob_event(event: Event):
 def validate_event(event: Event):
     account = event.data.url.split("/")[2].split(".")[0]
     container = event.data.url.split("/")[3]
+
     if (
         FieldStorageContainers[container.upper()].value != container
         or account != settings.STORAGE_ACCOUNT

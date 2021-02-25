@@ -17,7 +17,7 @@ class AzQueueService:
             pass
 
     def send_message(self, message: dict):
-        self.client.send_message(json.dumps(message), time_to_live=3)  # ttl: days
+        self.client.send_message(json.dumps(message), time_to_live=259200)  # ttl: seconds
 
     def fetch_message(self):
         messages = self.client.receive_messages()
