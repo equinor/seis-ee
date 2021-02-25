@@ -5,7 +5,6 @@ from azure.storage.fileshare import ShareClient, ShareDirectoryClient, ShareFile
 
 from settings import settings
 from utils import logger
-from os import path
 
 
 class AzFilesService:
