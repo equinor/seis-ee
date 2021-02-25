@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List
 from pydantic import BaseSettings
+import os
 
 
 class FieldStorageContainers(Enum):
@@ -16,8 +17,7 @@ class Settings(BaseSettings):
     BLOB_CONN_STRING: str
     QUEUE_CONN_STRING: str
     ENVIRONMENT: str
-    STORAGE_ACCOUNT_DEV: str = "devstoreaccount1"
-    STORAGE_ACCOUNT_PROD: str = "ccs"
+    STORAGE_ACCOUNT: str = "devstoreaccount1" if os.getenv("ENVIRONMENT") == "dev" else "ccs"
     FILES_SHARE: str = "ccs-passive"
     DECIMATED_FILES_DEST: str = "decimated_files"
     STREAM_TARGET_USER: str = "kkje"
