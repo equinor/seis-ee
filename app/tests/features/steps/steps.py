@@ -2,13 +2,13 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from behave import given, when, then, step
+from behave import given, when, then
 
 from classes.event import Event
 from event_listener import events
 from services.az_files_service import az_files_service
 from services.blob_service import BlobService
-from services.queue_service import convert_queue, stream_queue
+from services.queue_service import convert_queue
 from settings import FieldStorageContainers
 from azure.storage.queue import QueueMessage
 from mseed_converter import convert_to_mseed
@@ -33,7 +33,7 @@ def test_data_snorre(context):
 def step_impl2(context):
     event = Event.parse_raw(context.text)
     context.event = event
-    context.response = events([event])
+    context.response = events([event], "dummy")
 
 
 @then('the decimated file "{filename}" gets uploaded')
@@ -51,27 +51,19 @@ def step_impl4(context):
     assert expected == actual
 
 
-@given("an empty stream-queue")
-def step_impl5(context):
-    stream_queue.clear_messages()
-
-
-@step("an empty convert-queue")
+@given("an empty convert-queue")
 def step_impl6(context):
     convert_queue.clear_messages()
 
 
 @when("a message is sent")
 def step_impl7(context):
-    stream_queue.send_message({"Hallo": "sTream"})
     convert_queue.send_message({"Some": "Data", "Foo": "Bar"})
 
 
 @then("the queues contains messages")
 def step_impl8(context):
-    stream_msg = stream_queue.fetch_message()
     convert_msg = convert_queue.fetch_message()
-    assert stream_msg
     assert convert_msg
 
 

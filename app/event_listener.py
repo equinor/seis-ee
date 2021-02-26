@@ -1,3 +1,4 @@
+from time import sleep
 from typing import List
 
 import uvicorn
@@ -9,7 +10,7 @@ from classes.stream_file import StreamFile
 from exceptions import BadInputException
 from services.az_files_service import az_files_service
 from services.blob_service import BlobService
-from services.queue_service import convert_queue, stream_queue
+from services.queue_service import convert_queue
 from settings import FieldStorageContainers, settings
 from utils import delete_file, logger
 
@@ -30,7 +31,6 @@ def handle_new_blob_event(event: Event):
     uploaded_path = az_files_service.upload_file(file.decimated_path)
 
     # Add new messages to the queues
-    stream_queue.send_message({"format": format.value, "path": uploaded_path})
     convert_queue.send_message({"format": format.value, "path": uploaded_path})
     # Cleanup
     delete_file(filepath)
@@ -38,7 +38,6 @@ def handle_new_blob_event(event: Event):
     return f"Successfully decimated {event.data.url} and uploaded result to FileStorage"
 
 
-# TODO: Should add some more validation here. Block on IP or something
 def validate_event(event: Event):
     account = event.data.url.split("/")[2].split(".")[0]
     container = event.data.url.split("/")[3]
@@ -54,11 +53,14 @@ def validate_event(event: Event):
 
 
 @app.post("/events", status_code=status.HTTP_202_ACCEPTED)
-def events(event_list: List[Event]):
+def events(event_list: List[Event], secret: str = None):
+    if secret != settings.EVENT_SECRET:
+        # Add some delay to discourage brute force attempts
+        sleep(5)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
     results = []
     for event in event_list:
-
-        # TODO: Verify with shared secret
 
         # Handle Validation requests first
         if event.eventType == "Microsoft.EventGrid.SubscriptionValidationEvent":
