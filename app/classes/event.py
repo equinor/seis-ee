@@ -4,7 +4,7 @@ from pydantic import BaseModel, PydanticValueError, validator
 
 from exceptions import BadInputException
 from settings import FieldStorageContainers
-from utils import sanitize_shell_arguments
+from utils import logger, sanitize_shell_arguments
 
 
 class EventData(BaseModel):
@@ -43,7 +43,9 @@ class EventData(BaseModel):
             return FieldStorageContainers.GRANE
         if container == FieldStorageContainers.SNORRE.value:
             return FieldStorageContainers.SNORRE
-        raise ValueError("Failed to extract container/field from event url'")
+        msg = f"Failed to extract container/field from event url. Unrecognized container '{container}'"
+        logger.error(msg)
+        raise ValueError(msg)
 
 
 class SubscriptionValidation(BaseModel):
