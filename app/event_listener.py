@@ -19,15 +19,6 @@ app = FastAPI()
 
 def handle_new_blob_event(event: Event):
     format: FieldStorageContainers = event.data.field
-    if not (
-        format == FieldStorageContainers.SNORRE
-        or format == FieldStorageContainers.GRANE
-        or format == FieldStorageContainers.OSEBERG
-    ):
-        raise Exception(
-            """Invalid format for file. Correct format is FieldStorageContainers.SNORRE,
-            FieldStorageContainers.GRANE or FieldStorageContainers.OSEBERG"""
-        )
 
     # Download the raw file from the common BlobStorage
     filepath = BlobService(event.data.field).download_blob(event.data.filepath)

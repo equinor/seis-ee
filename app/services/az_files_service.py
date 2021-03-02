@@ -5,7 +5,7 @@ from azure.storage.fileshare import ShareClient, ShareDirectoryClient, ShareFile
 
 from settings import settings
 from utils import logger
-
+from exceptions import DownloadFileException
 
 class AzFilesService:
     def __init__(self):
@@ -55,7 +55,7 @@ class AzFilesService:
         file_properties = file_client.get_file_properties()
         file_size = file_properties.content_length  # size of file in bytes
         if file_size > settings.FILE_SIZE_LIMIT_IN_BYTES:
-            raise Exception("Tried to decimate a file larger than 400 MB. Abort.")
+            raise DownloadFileException("Tried to decimate a file larger than 400 MB. Abort.")
         logger.info(f"Downloading file from azure storage to local file {output_filename}")
 
         # Open a file for writing bytes on the local system - will write over existing file

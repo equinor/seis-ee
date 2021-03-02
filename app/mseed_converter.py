@@ -1,28 +1,20 @@
-from utils import logger, sanitize_shell_arguments
+from utils import logger, sanitize_shell_arguments, is_valid_file_format
 import subprocess  # nosec
-from settings import FieldStorageContainers
 from services.az_files_service import az_files_service
 from services.queue_service import convert_queue
 from azure.storage.queue import QueueMessage
+from exceptions import MSeedConvertionException, DownloadFileException
 import time
 import json
 
 
-def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
+def convert_to_mseed(azure_storage_decimated_file_path: str):
     output_file_path: str = "/data/mseed/" + azure_storage_decimated_file_path
 
     # download from azure file storage to local storage
-    try:
-        local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
-    except Exception as e:
-        raise Exception(
-            f"For mseed conversion, could not download the specified file from azure file storage. Error message: {e}"
-        )
+    local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
 
-    if file_format in [item.value for item in FieldStorageContainers]:
-        cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)}"
-    else:
-        raise Exception("Wrong file format for file in convert queue. Could not convert this file to mseed.")
+    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)}"
 
     try:
         logger.info(f"converting file {local_file} to mseed ...")
@@ -38,7 +30,7 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, file_format: str):
         logger.info(mseed_converter_process)
     except subprocess.CalledProcessError as e:
         logger.warning(e.stderr)
-        raise Exception("Something went wrong during mseed conversion. Error message: ", e.stderr)
+        raise MSeedConvertionException(f"Something went wrong during mseed conversion. Error message: {e.stderr}")
 
 
 def poll_convert_queue():
@@ -53,20 +45,26 @@ def poll_convert_queue():
                 message_content = json.loads(msg.content)
                 azure_storage_decimated_file_path = message_content["path"]
                 file_format = message_content["format"]
-                convert_to_mseed(azure_storage_decimated_file_path, file_format)
+                if (is_valid_file_format(file_format)):
+                    convert_to_mseed(azure_storage_decimated_file_path)
+                else:
+                    raise MSeedConvertionException(f"Format in message was not valid: {file_format}")
+                convert_queue.delete_message(msg)
             except KeyError as e:
                 logger.error(
                     """The convert queue message content could not be read correctly.
                     Skip converting this file to mseed and delete this queue message.""",
                     e,
                 )
-            except Exception as e:
+                convert_queue.delete_message(msg)
+            except (MSeedConvertionException, DownloadFileException) as e:
                 logger.error(
-                    """Something went wrong when converting decimated file to mseed.
-                    Skip converting this file and delete the queue message. Error message: """,
-                    e,
+                    f"""Error occurred when converting decimated file to mseed.
+                    Error message: {e}"""
                 )
-            convert_queue.delete_message(msg)
+                convert_queue.delete_message(msg)
+            except Exception as e:
+                logger.error(f"Unknown error occurred when converting decimated file to mseed: {e}")
         else:
             time.sleep(SLEEP_TIME)
 
