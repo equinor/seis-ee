@@ -2,6 +2,10 @@ name: Build & publish container image
 on:
   push:
     branches: [update-ci]
+
+env:
+  APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
+
 jobs:
   build_and_push:
     name: Push Docker image to GitHub Packages
