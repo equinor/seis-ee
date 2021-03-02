@@ -25,7 +25,8 @@ def handle_new_blob_event(event: Event):
         or format == FieldStorageContainers.OSEBERG
     ):
         raise Exception(
-            f"Invalid format for file. Correct format is FieldStorageContainers.SNORRE, FieldStorageContainers.GRANE or FieldStorageContainers.OSEBERG"
+            """Invalid format for file. Correct format is FieldStorageContainers.SNORRE,
+            FieldStorageContainers.GRANE or FieldStorageContainers.OSEBERG"""
         )
 
     # Download the raw file from the common BlobStorage
