@@ -56,16 +56,15 @@ def poll_convert_queue():
                 convert_to_mseed(azure_storage_decimated_file_path, file_format)
             except KeyError as e:
                 logger.error(
-                    """The convert queue message content could not be read correctly. 
-                    Skip converting this file to mseed and delete this queue message. """,
+                    """The convert queue message content could not be read correctly.
+                    Skip converting this file to mseed and delete this queue message.""",
                     e,
                 )
             except Exception as e:
-                logger.error(e)
-            except:
                 logger.error(
-                    """Something went wrong when converting decimated file to mseed. 
-                    Skip converting this file and delete the queue message."""
+                    """Something went wrong when converting decimated file to mseed.
+                    Skip converting this file and delete the queue message. Error message: """,
+                    e,
                 )
             convert_queue.delete_message(msg)
         else:
