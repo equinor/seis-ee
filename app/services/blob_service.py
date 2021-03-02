@@ -31,5 +31,7 @@ class BlobService:
         Path(f"{settings.TMP_BLOB_DIR}/{dirs}").mkdir(parents=True, exist_ok=True)
         with open(f"{settings.TMP_BLOB_DIR}/{filename}", "wb") as blob_file:
             raw = self.blob_client(filename).download_blob().readall()
+            if raw == b"":
+                raise Exception("Tried to decimate an empty file.")
             blob_file.write(raw)
         return str(Path(f"{settings.TMP_BLOB_DIR}/{filename}").absolute())

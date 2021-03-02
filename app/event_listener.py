@@ -18,7 +18,15 @@ app = FastAPI()
 
 
 def handle_new_blob_event(event: Event):
-    format = event.data.field
+    format: FieldStorageContainers = event.data.field
+    if not (
+        format == FieldStorageContainers.SNORRE
+        or format == FieldStorageContainers.GRANE
+        or format == FieldStorageContainers.OSEBERG
+    ):
+        raise Exception(
+            f"Invalid format for file. Correct format is FieldStorageContainers.SNORRE, FieldStorageContainers.GRANE or FieldStorageContainers.OSEBERG"
+        )
 
     # Download the raw file from the common BlobStorage
     filepath = BlobService(event.data.field).download_blob(event.data.filepath)
@@ -42,13 +50,15 @@ def validate_event(event: Event):
     account = event.data.url.split("/")[2].split(".")[0]
     container = event.data.url.split("/")[3]
 
-    if (
-        FieldStorageContainers[container.upper()].value != container
-        or account != settings.STORAGE_ACCOUNT
-        or event.eventType != "Microsoft.Storage.BlobCreated"
-        or event.data.blobType != "BlockBlob"
-    ):
-        return False
+    if FieldStorageContainers[container.upper()].value != container:
+        raise Exception("Invalid event posted. Reason: wrong container.")
+    elif account != settings.STORAGE_ACCOUNT:
+        raise Exception("Invalid event posted. Reason: wrong storage account.")
+    elif event.eventType != "Microsoft.Storage.BlobCreated":
+        raise Exception("Invalid event posted. Reason: wrong event type.")
+    elif event.data.blobType != "BlockBlob":
+        raise Exception("Invalid event posted. Reason: wrong blob type.")
+
     return True
 
 
@@ -66,8 +76,10 @@ def events(event_list: List[Event], secret: str = None):
         if event.eventType == "Microsoft.EventGrid.SubscriptionValidationEvent":
             return {"validationResponse": event.data.validationCode}
 
-        if not validate_event(event):
-            logger.warning("Invalid event posted. Reason: Wrong storage account or container")
+        try:
+            validate_event(event)
+        except Exception as e:
+            logger.warning(e)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid event posted")
 
         try:

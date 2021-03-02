@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     SNORRE_SAMPLE_RATE: int = 1250
     SNORRE_FILE_HEADER_SIZE: int = 192
     GRANE_FILE_HEADER_SIZE: int = 160
+    FILE_SIZE_LIMIT_IN_BYTES: int = 400000000
 
     # This is just for local debugging. Environment variables should be injected via docker-compose/kubernetes
     class Config:
