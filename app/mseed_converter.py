@@ -16,21 +16,17 @@ def convert_to_mseed(azure_storage_decimated_file_path: str):
 
     cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)}"
 
-    try:
-        logger.info(f"converting file {local_file} to mseed ...")
-        # TODO: substitute the c++ program with the real mseed converter
-        mseed_converter_process = subprocess.run(  # noqa
-            args=f"cd ..; ./mseed-app/main {cli_parameters}",
-            # noqa
-            shell=True,  # noqa
-            check=True,
-            capture_output=True,
-            encoding="UTF-8",
-        )
-        logger.info(mseed_converter_process)
-    except subprocess.CalledProcessError as e:
-        logger.warning(e.stderr)
-        raise MSeedConvertionException(f"Something went wrong during mseed conversion. Error message: {e.stderr}")
+    logger.info(f"converting file {local_file} to mseed ...")
+    # TODO: substitute the c++ program with the real mseed converter
+    mseed_converter_process = subprocess.run(  # noqa
+        args=f"cd ..; ./mseed-app/main {cli_parameters}",
+        # noqa
+        shell=True,  # noqa
+        check=True,
+        capture_output=True,
+        encoding="UTF-8",
+    )
+    logger.info(mseed_converter_process)
 
 
 def poll_convert_queue():
@@ -45,7 +41,7 @@ def poll_convert_queue():
                 message_content = json.loads(msg.content)
                 azure_storage_decimated_file_path = message_content["path"]
                 file_format = message_content["format"]
-                if (is_valid_file_format(file_format)):
+                if is_valid_file_format(file_format):
                     convert_to_mseed(azure_storage_decimated_file_path)
                 else:
                     raise MSeedConvertionException(f"Format in message was not valid: {file_format}")
@@ -63,8 +59,10 @@ def poll_convert_queue():
                     Error message: {e}"""
                 )
                 convert_queue.delete_message(msg)
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to run the mseed conversion program through subprocess.run. Error message: {e}")
             except Exception as e:
-                logger.error(f"Unknown error occurred when converting decimated file to mseed: {e}")
+                logger.error(f"Unknown error occurred when converting decimated file to mseed. Error message: {e}")
         else:
             time.sleep(SLEEP_TIME)
 

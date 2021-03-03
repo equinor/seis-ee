@@ -51,6 +51,7 @@ def sanitize_shell_arguments(in_arg: str) -> str:
         raise BadInputException(f"The string {in_arg} contains invalid characters [{match.group()}]")
     return quote(in_arg)
 
+
 def is_valid_file_format(file_format: str) -> bool:
     if file_format in [item.value for item in FieldStorageContainers]:
         return True

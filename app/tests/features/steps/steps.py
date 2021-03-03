@@ -78,7 +78,7 @@ def step_impl(context, file, target_dir):
     message_content: dict = json.loads(convert_msg.content)
     azure_storage_decimated_file_path: str = message_content["path"]
     file_format: str = message_content["format"]
-    if (is_valid_file_format(file_format)):
+    if is_valid_file_format(file_format):
         convert_to_mseed(azure_storage_decimated_file_path)
     convert_to_mseed(azure_storage_decimated_file_path, file_format)
 

@@ -7,6 +7,7 @@ from settings import settings
 from utils import logger
 from exceptions import DownloadFileException
 
+
 class AzFilesService:
     def __init__(self):
         self.conn_str = settings.FILES_CONN_STRING
