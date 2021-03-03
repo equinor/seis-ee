@@ -26,7 +26,7 @@ jobs:
 
 
   deploy_master_to_radix:
-    needs: [build_and_push]
+    needs: [build_and_push, testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
