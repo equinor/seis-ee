@@ -10,4 +10,5 @@ class TestMseedConverterExceptionsRaised(unittest.TestCase):
 
     def testWrongFileName(self):
         wrong_azure_storage_decimated_file_path = "oseberg/2021/3/3/wrongfile"
-        self.assertRaises(ResourceNotFoundError, convert_to_mseed, wrong_azure_storage_decimated_file_path)
+        with self.assertRaises(ResourceNotFoundError):
+            convert_to_mseed(wrong_azure_storage_decimated_file_path)
