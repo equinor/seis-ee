@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from utils import is_valid_file_format
 from behave import given, when, then
 
 from classes.event import Event
