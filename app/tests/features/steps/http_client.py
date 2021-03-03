@@ -25,7 +25,8 @@ def send_request_with_data(context, event_data: str):
     event_data_obj = json.loads(event_data)
     event = [
         {
-            "topic": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myrg/providers/Microsoft.Storage/storageAccounts/myblobstorageaccount",
+            "topic": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myrg/providers/"
+            "Microsoft.Storage/storageAccounts/myblobstorageaccount",
             "subject": "/blobServices/default/containers/testcontainer/blobs/testfile.txt",
             "eventType": f"{event_data_obj['blob_event_type']}",
             "eventTime": "2017-08-16T20:33:51.0595757Z",
@@ -38,7 +39,8 @@ def send_request_with_data(context, event_data: str):
                 "contentType": "text/plain",
                 "contentLength": "123",
                 "blobType": f"{event_data_obj['blob_type']}",
-                "url": f"https://{event_data_obj['storage_account']}.blob.core.windows.net/{event_data_obj['container']}/test_data/oseberg/oseberg-test.su",
+                "url": f"https://{event_data_obj['storage_account']}.blob.core.windows.net/"
+                f"{event_data_obj['container']}/test_data/oseberg/oseberg-test.su",
                 "sequencer": "00000000000000EB0000000000046199",
                 "storageDiagnostics": {"batchId": "dffea416-b46e-4613-ac19-0371c0c5e352"},
             },

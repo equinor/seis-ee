@@ -1,7 +1,6 @@
 import unittest
 from mseed_converter import convert_to_mseed
 from azure.core.exceptions import ResourceNotFoundError
-from exceptions import BadInputException
 
 
 class TestMseedConverterExceptionsRaised(unittest.TestCase):

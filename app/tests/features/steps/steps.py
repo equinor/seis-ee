@@ -80,6 +80,6 @@ def step_impl(context, file, target_dir):
     file_format: str = message_content["format"]
     if is_valid_file_format(file_format):
         convert_to_mseed(azure_storage_decimated_file_path)
-    convert_to_mseed(azure_storage_decimated_file_path, file_format)
+    convert_to_mseed(azure_storage_decimated_file_path)
 
     # todo add an assert to check if file has been created - when mseed converter is finished
