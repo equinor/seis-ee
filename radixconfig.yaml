@@ -14,9 +14,6 @@ spec:
       variables:
         ENVIRONMENT: prod
         RUN_MODE: decimator
-        GRANE_SENSORS: [1, 2, 3, 5]
-        OSEBERG_SENSORS: [12, 21]
-        SNORRE_SENSORS: [1, 2, 3, 5]
       ports:
         - name: http
           port: 5000
