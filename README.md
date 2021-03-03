@@ -21,4 +21,28 @@ A workflow for processing raw segy/su seismic files into a more managable and mo
 
 ## Notable Dependencies
 
-- Decimate - Used to extract given traces from segd files - https://git.equinor.com/sentry/decimate
+- Decimate - Used to extract given traces from segd files - <https://git.equinor.com/sentry/decimate>
+
+## Notes
+
+### slinktool usage
+
+<https://github.com/iris-edu/slinktool/blob/master/doc/slinktool.md>
+
+List stations:
+
+``` bash
+slinktool -Q 10.1.0.2
+```
+
+Format all stations to the slinktool stream selector
+
+```bash
+slinktool -Q 10.1.0.2 | cut -d " " -f 1-2 | sed "s|\ |_|g" | sed -z 's/\n/,/g'
+```
+
+So slink commands looks like;
+
+```bash
+slinktool -S 'NS_ASK,NS_ASK,<...>,NS_VBYGD,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
+```
