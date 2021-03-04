@@ -1,7 +1,7 @@
 name: Build & publish container image
 on:
   push:
-    branches: [update-ci]
+    branches: [master]
 
 env:
   APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
