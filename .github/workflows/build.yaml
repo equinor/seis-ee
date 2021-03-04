@@ -7,8 +7,25 @@ env:
   APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
 
 jobs:
+  testing:
+    name: Run tests
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+      - name: "pip install pre-commit and poetry"
+        run: pip install pre-commit poetry
+      - name: Pre-Commit
+        # Until we can build the container (Open Source Decimate), use alternative config file.
+        run: pre-commit run --all-files --verbose -c .pre-commit-config-ci.yaml
+
+
   build_and_push:
     name: Push Docker image to GitHub Packages
+    needs: [testing]
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -26,7 +43,8 @@ jobs:
 
 
   deploy_master_to_radix:
-    needs: [build_and_push]
+    needs: [build_and_push, testing]
+    name: Deploy to radix
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
