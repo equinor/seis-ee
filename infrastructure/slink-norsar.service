@@ -1,0 +1,10 @@
+[Unit]
+Description=mSeed HNet Streaming with SeisComp4 SLinkTool from NORSAR
+
+[Service]
+User=hnet-admin
+ExecStart=/seiscomp/seiscomp/bin/slinktool -v -s 'HH?.D' -S 'NO_HNA0,NO_HNA1,NO_HNA2,NO_HNA3,NO_HNB1,NO_HNB2,NO_HNB3,NO_HNB4,NO_HNB5' -SDS /data/mseed/norsar 10.1.0.3:18000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
