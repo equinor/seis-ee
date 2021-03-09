@@ -1,32 +1,21 @@
-name: Build & publish container image
+name: Build, test publish container image and deploy
 on:
-  push:
-    branches: [master]
+  push
 
 env:
   APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
 
+  # these env variables use the "dev" values
+  ENVIRONMENT: dev
+  FILES_CONN_STRING: ${{secrets.FILES_CONN_STRING}}
+  BLOB_CONN_STRING: ${{secrets.BLOB_CONN_STRING}}
+  QUEUE_CONN_STRING: ${{secrets.QUEUE_CONN_STRING}}
+
 jobs:
-  testing:
+  build_and_test:
     name: Run tests
     runs-on: ubuntu-20.04
 
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8.x'
-      - name: "pip install pre-commit and poetry"
-        run: pip install pre-commit poetry
-      - name: Pre-Commit
-        # Until we can build the container (Open Source Decimate), use alternative config file.
-        run: pre-commit run --all-files --verbose -c .pre-commit-config-ci.yaml
-
-
-  build_and_push:
-    name: Push Docker image to GitHub Packages
-    needs: [testing]
-    runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -38,13 +27,24 @@ jobs:
         run: echo ${{ secrets.GITLAB_ACCESS_TOKEN }} | docker login registry.git.equinor.com/sentry/decimate -u ${{ secrets.GITLAB_USERNAME }} --password-stdin
       - name: Build
         run: docker build . --tag ghcr.io/equinor/ccs-passive --cache-from ghcr.io/equinor/ccs-passive
-      - name: Push
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+      - name: "pip install pre-commit and poetry"
+        run: pip install pre-commit poetry
+      - name: build decimator
+        run: docker-compose -f docker-compose.ci.yaml build decimator
+      - name: Pre-Commit
+        run: pre-commit run --all-files --verbose
+      - name: push docker image
+        if: github.ref == 'refs/heads/master'
         run: docker push ghcr.io/equinor/ccs-passive
 
 
   deploy_master_to_radix:
-    needs: [build_and_push, testing]
     name: Deploy to radix
+    needs: [build_and_test]
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
