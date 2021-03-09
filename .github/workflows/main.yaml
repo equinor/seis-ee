@@ -5,6 +5,12 @@ on:
 env:
   APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
 
+  # these env variables use the "dev" values
+  ENVIRONMENT: ${{secrets.ENVIRONMENT}}
+  FILES_CONN_STRING: ${{secrets.FILES_CONN_STRING}}
+  BLOB_CONN_STRING: ${{secrets.BLOB_CONN_STRING}}
+  QUEUE_CONN_STRING: ${{secrets.QUEUE_CONN_STRING}}
+
 jobs:
   build_and_test:
     name: Run tests
