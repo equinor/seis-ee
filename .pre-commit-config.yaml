@@ -36,11 +36,6 @@ repos:
 
 - repo: local
   hooks:
-    - id: build
-      name: Docker Build
-      entry: sh -c "docker-compose build decimator"
-      pass_filenames: false
-      language: system
     - id: unittests
       name: Unit Tests
       entry: sh -c "docker-compose run decimator pytest -v  --no-header"

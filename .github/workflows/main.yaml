@@ -26,6 +26,8 @@ jobs:
           python-version: '3.8.x'
       - name: "pip install pre-commit and poetry"
         run: pip install pre-commit poetry
+      - name: build decimator
+        run: docker-compose build decimator
       - name: Pre-Commit
         run: pre-commit run --all-files --verbose -c .pre-commit-config.yaml
 
