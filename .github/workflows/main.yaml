@@ -1,0 +1,58 @@
+name: Build, test publish container image and deploy
+on:
+  push
+
+env:
+  APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
+
+jobs:
+  build_and_test:
+    name: Run tests
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Docker login
+        run: echo ${{ secrets.PRIVATE_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Pull latest
+        run: docker pull ghcr.io/equinor/ccs-passive
+      - name: get access to decimate image
+        run: echo ${{ secrets.GITLAB_ACCESS_TOKEN }} | docker login registry.git.equinor.com/sentry/decimate -u ${{ secrets.GITLAB_USERNAME }} --password-stdin
+      - name: Build
+        run: docker build . --tag ghcr.io/equinor/ccs-passive --cache-from ghcr.io/equinor/ccs-passive
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+      - name: "pip install pre-commit and poetry"
+        run: pip install pre-commit poetry
+      - name: Pre-Commit
+        run: pre-commit run --all-files --verbose -c .pre-commit-config.yaml
+
+
+  push_docker_image:
+    name: Push Docker image to GitHub Packages
+    needs: [build_and_test]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push
+        run: docker push ghcr.io/equinor/ccs-passive
+
+
+  deploy_master_to_radix:
+    name: Deploy to radix
+    needs: [build_and_test, push_docker_image]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy Master on Radix
+        uses: equinor/radix-github-actions@master
+        with:
+          args: >
+            create job
+            deploy
+            --from-config
+            -e ccs-passive
+            -f
