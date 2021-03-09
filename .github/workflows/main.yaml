@@ -6,7 +6,7 @@ env:
   APP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.K8S_CREDENTIALS }}
 
   # these env variables use the "dev" values
-  ENVIRONMENT: ${{secrets.ENVIRONMENT}}
+  ENVIRONMENT: dev
   FILES_CONN_STRING: ${{secrets.FILES_CONN_STRING}}
   BLOB_CONN_STRING: ${{secrets.BLOB_CONN_STRING}}
   QUEUE_CONN_STRING: ${{secrets.QUEUE_CONN_STRING}}
@@ -35,7 +35,7 @@ jobs:
       - name: build decimator
         run: docker-compose -f docker-compose.ci.yaml build decimator
       - name: Pre-Commit
-        run: pre-commit run --all-files --verbose -c .pre-commit-config.yaml
+        run: pre-commit run --all-files --verbose
       - name: push docker image
         if: github.ref == 'refs/heads/master'
         run: docker push ghcr.io/equinor/ccs-passive
