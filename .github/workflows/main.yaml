@@ -33,7 +33,7 @@ jobs:
       - name: "pip install pre-commit and poetry"
         run: pip install pre-commit poetry
       - name: build decimator
-        run: docker-compose build decimator
+        run: docker-compose -f docker-compose.ci.yaml build decimator
       - name: Pre-Commit
         run: pre-commit run --all-files --verbose -c .pre-commit-config.yaml
 
