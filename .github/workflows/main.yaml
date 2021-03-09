@@ -36,15 +36,8 @@ jobs:
         run: docker-compose -f docker-compose.ci.yaml build decimator
       - name: Pre-Commit
         run: pre-commit run --all-files --verbose -c .pre-commit-config.yaml
-
-
-  push_docker_image:
-    name: Push Docker image to GitHub Packages
-    needs: [build_and_test]
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Push
+      - name: push docker image
+        if: github.ref == 'refs/heads/master'
         run: docker push ghcr.io/equinor/ccs-passive
 
 
