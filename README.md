@@ -38,11 +38,11 @@ slinktool -Q 10.1.0.2
 Format all stations to the slinktool stream selector
 
 ```bash
-slinktool -Q 10.1.0.2 | cut -d " " -f 1-2 | sed "s|\ |_|g" | sed -z 's/\n/,/g'
+slinktool -Q 10.1.0.2 | cut -d " " -f 1-2 | uniq | sed "s|\ |_|g" | sed -z 's/\n/,/g'
 ```
 
 So slink command looks like;
 
 ```bash
-slinktool -S 'NS_ASK,NS_ASK,<...>,NS_VBYGD,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
+slinktool -S 'NS_ASK,<...>,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
 ```
