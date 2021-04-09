@@ -8,8 +8,6 @@ DISK_PERCENTAGE_LIMIT=80
 
 SERVICES=(ringserver-nnsn link-nnsn slink-norsar)
 
-SAS_TOKEN="GET_FROM_AZURE..."
-
 EQUINOR_FOLDER="/ccs-passive/mseed/equinor"
 NNSN_FOLDER="/ccs-passive/mseed/nnsn"
 NNSN_EQUINOR_FOLDER="/ccs-passive/mseed/nnsn-equinor"
