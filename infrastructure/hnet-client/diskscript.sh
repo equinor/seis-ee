@@ -1,10 +1,12 @@
+
+# This script assumes that the azure file storage dev-ccs-passive (located in the ccs storage account on Azure) is mounted to the local folder /archive.
+
+
 DISK_NAME=/dev/sdc
 DISK_PERCENTAGE_USED=$(df -Ph $DISK_NAME | grep -Po '\d+(?=%)')
 DISK_PERCENTAGE_LIMIT=80
 
-RINGSERVER_SERVICE=ringserver-nnsn.service
-SLINK_NNSN_SERVICE=slink-nnsn.service
-SLINK_NORSAR_SERVICE=slink-norsar.service
+SERVICES=(ringserver-nnsn link-nnsn slink-norsar)
 
 SAS_TOKEN="GET_FROM_AZURE..."
 
@@ -17,24 +19,18 @@ FOLDERS_TO_COPY=($EQUINOR_FOLDER $NNSN_FOLDER $NNSN_EQUINOR_FOLDER $NORSAR_FOLDE
 
 if [ $DISK_PERCENTAGE_USED -gt $DISK_PERCENTAGE_LIMIT ]
 then
-    echo "Disk is almost full - move files from ccs-passive to azure."
+    echo "Disk is almost full - moving miniSeed data from local disk to azureFiles."
 
     # SHUT DOWN STREAM SERVICES
-    sudo systemctl stop $RINGSERVER_SERVICE $SLINK_NNSN_SERVICE $SLINK_NORSAR_SERVICE
+    sudo systemctl stop ${SERVICES[@]}
 
-    # MOVE FILES FROM SDS DISK TO AZURE FILE STORAGE
-    for folder in "${FOLDERS_TO_COPY[@]}"
-    do
-        echo $folder
-        if sudo azcopy copy $folder "https://ccs.file.core.windows.net/prod-ccs-passive/ccs-passive$SAS_TOKEN" --recursive ; then
-            rm -r $folder
-        else
-            echo "ERROR: could not folder $folder to Azure..."
-        fi
-    done
+    # MOVE FILES FROM SDS DISK TO AZURE FILES AND DELETE MSEED FILES FROM /ccs-passive/mseed
+    if sudo rsync -a /ccs-passive/mseed /archive/mseed ; then
+        rm -r ${FOLDERS_TO_COPY[@]}
+    fi
 
     # RESTART STREAM SERVICES
-    sudo systemctl start $RINGSERVER_SERVICE $SLINK_NNSN_SERVICE $SLINK_NORSAR_SERVICE
+    sudo systemctl start ${SERVICES[@]}
 
 fi
 
