@@ -9,6 +9,7 @@ class FieldStorageContainers(Enum):
     GRANE = "grane"
     SNORRE = "snorre"
 
+
 class DecimatedFileTypes(Enum):
     SEGD = "segd"
     SEGY = "segy"

@@ -82,5 +82,5 @@ def step_impl(context, filename: str, target_dir: str, station: DecimatedFileTyp
 
 @given('output file "{filepath}" does not exist')
 def step_impl(context, filepath: str):
-    if (os.path.exists(filepath)):
+    if os.path.exists(filepath):
         os.remove(filepath)

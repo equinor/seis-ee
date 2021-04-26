@@ -15,24 +15,25 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, station: FieldStora
     # download from azure file storage to local storage
     local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
     station_code: str = ""
-    if (station == FieldStorageContainers.GRANE.value):
+    if station == FieldStorageContainers.GRANE.value:
         station_code = "GR"
-    elif (station == FieldStorageContainers.SNORRE.value):
+    elif station == FieldStorageContainers.SNORRE.value:
         station_code = "SN"
-    elif (station == FieldStorageContainers.OSEBERG.value):
+    elif station == FieldStorageContainers.OSEBERG.value:
         station_code = "OS"
     channel_code: str = "X"
     network_code: str = "NS"
-    #todo how to select correct channel_code and network_code?
-
+    # todo how to select correct channel_code and network_code?
 
     converter_app: str
-    if (station == FieldStorageContainers.SNORRE.value or station == FieldStorageContainers.GRANE.value):
+    if station == FieldStorageContainers.SNORRE.value or station == FieldStorageContainers.GRANE.value:
         converter_app = "./segdconv"
-    elif (station == FieldStorageContainers.OSEBERG.value):
+    elif station == FieldStorageContainers.OSEBERG.value:
         converter_app = "./segyconv"
     else:
-        raise MSeedConvertionException(f"wrong file type used as input to function convert_to_mseed(). file type used: {station}")
+        raise MSeedConvertionException(
+            f"wrong file type used as input to function convert_to_mseed(). file type used: {station}"
+        )
 
     cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)} {station_code} {channel_code} {network_code}"
 
