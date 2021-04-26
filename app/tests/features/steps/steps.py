@@ -72,7 +72,7 @@ def add_msg_to_convert_queue(context, format, path):
 
 
 @then('after converting a "{station}" file, "{filename}" has been created in "{target_dir}"')
-def step_impl(context, filename: str, target_dir: str, station: DecimatedFileTypes):
+def contert_to_mseed(context, filename: str, target_dir: str, station: DecimatedFileTypes):
     convert_msg: QueueMessage = convert_queue.fetch_message()
     message_content: dict = json.loads(convert_msg.content)
     azure_storage_decimated_file_path: str = message_content["path"]
@@ -81,6 +81,6 @@ def step_impl(context, filename: str, target_dir: str, station: DecimatedFileTyp
 
 
 @given('output file "{filepath}" does not exist')
-def step_impl(context, filepath: str):
+def remove_file(context, filepath: str):
     if os.path.exists(filepath):
         os.remove(filepath)

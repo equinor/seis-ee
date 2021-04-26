@@ -35,7 +35,9 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, station: FieldStora
             f"wrong file type used as input to function convert_to_mseed(). file type used: {station}"
         )
 
-    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)} {station_code} {channel_code} {network_code}"
+    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} \
+                            {sanitize_shell_arguments(output_file_path)} \
+                            {station_code} {channel_code} {network_code}"
 
     logger.info(f"converting file {local_file} to mseed ...")
     # TODO: substitute the c++ program with the real mseed converter
