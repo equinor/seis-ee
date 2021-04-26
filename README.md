@@ -20,8 +20,11 @@ A workflow for processing raw segy/su seismic files into a more managable and mo
 8. (Out of scope) Equinor consumers of the data can connect to the seedlink server
 
 ## Notable Dependencies
+The seis-ee application uses the following applications (as docker images):
+- Decimate - Used to extract given traces from segd files - <https://github.com/equinor/decimate> (forked from <https://git.equinor.com/sentry/decimate> with minor changes)
+- Segy to mseed converter - Created by Øyvind Natvik from UiB - <https://github.com/equinor/segy-to-miniseed>
+- Segd to mseed converter - Created by Øyvind Natvik from UiB - <https://github.com/equinor/segy-to-miniseed>
 
-- Decimate - Used to extract given traces from segd files - <https://git.equinor.com/sentry/decimate>
 
 ## Notes
 
@@ -50,7 +53,7 @@ slinktool -S 'NS_ASK,<...>,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
 
 # Testing
 
-docker-compose run converter behave /app/tests/features/python_wrapper_mseed_converter.feature
+docker-compose run converter behave /app/tests/features/mseed_converter.feature
 
 
 check that mseed converter programs are avaialble in docker image

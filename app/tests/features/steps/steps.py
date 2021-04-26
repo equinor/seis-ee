@@ -71,12 +71,12 @@ def add_msg_to_convert_queue(context, format, path):
     convert_queue.send_message({"format": format.replace('"', ""), "path": path.replace('"', "")})
 
 
-@then('after converting a "{fileType}" file, "{filename}" has been created in "{target_dir}"')
-def step_impl(context, filename: str, target_dir: str, fileType: DecimatedFileTypes):
+@then('after converting a "{station}" file, "{filename}" has been created in "{target_dir}"')
+def step_impl(context, filename: str, target_dir: str, station: DecimatedFileTypes):
     convert_msg: QueueMessage = convert_queue.fetch_message()
     message_content: dict = json.loads(convert_msg.content)
     azure_storage_decimated_file_path: str = message_content["path"]
-    convert_to_mseed(azure_storage_decimated_file_path, fileType)
+    convert_to_mseed(azure_storage_decimated_file_path, station)
     os.path.exists(f"{target_dir}/{filename}")
 
 
