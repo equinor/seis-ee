@@ -12,8 +12,6 @@ import json
 def convert_to_mseed(azure_storage_decimated_file_path: str, station: FieldStorageContainers):
     output_file_path: str = "data/mseed/"
 
-    # download from azure file storage to local storage
-    local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
     station_code: str = ""
     if station == FieldStorageContainers.GRANE.value:
         station_code = "GR"
@@ -35,9 +33,16 @@ def convert_to_mseed(azure_storage_decimated_file_path: str, station: FieldStora
             f"wrong file type used as input to function convert_to_mseed(). file type used: {station}"
         )
 
-    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} \
-                            {sanitize_shell_arguments(output_file_path)} \
-                            {station_code} {channel_code} {network_code}"
+    # download from azure file storage to local storage
+    local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
+
+    cli_parameters: str = (
+        f"{sanitize_shell_arguments(local_file)} "
+        + f"{sanitize_shell_arguments(output_file_path)} "
+        + f"{station_code} "
+        + f"{channel_code} "
+        + f"{network_code}"
+    )
 
     logger.info(f"converting file {local_file} to mseed ...")
     # TODO: substitute the c++ program with the real mseed converter
