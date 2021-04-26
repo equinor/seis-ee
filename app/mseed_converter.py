@@ -4,22 +4,35 @@ from services.az_files_service import az_files_service
 from services.queue_service import convert_queue
 from azure.storage.queue import QueueMessage
 from exceptions import MSeedConvertionException, DownloadFileException
+from settings import DecimatedFileTypes
 import time
 import json
 
 
-def convert_to_mseed(azure_storage_decimated_file_path: str):
-    output_file_path: str = "/data/mseed/" + azure_storage_decimated_file_path
+def convert_to_mseed(azure_storage_decimated_file_path: str, fileType: DecimatedFileTypes):
+    output_file_path: str = "data/mseed/"
 
     # download from azure file storage to local storage
     local_file: str = az_files_service.download_file(azure_storage_decimated_file_path)
+    station_code: str = "GR"
+    channel_code: str = "X"
+    network_code: str = "NS"
 
-    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)}"
+
+    converter_app: str
+    if (fileType == DecimatedFileTypes.SEGD.value):
+        converter_app = "./segdconv"
+    elif (fileType == DecimatedFileTypes.SEGY.value):
+        converter_app = "./segyconv"
+    else:
+        raise MSeedConvertionException(f"wrong file type used as input to function convert_to_mseed(). file type used: {fileType}")
+
+    cli_parameters: str = f"{sanitize_shell_arguments(local_file)} {sanitize_shell_arguments(output_file_path)} {station_code} {channel_code} {network_code}"
 
     logger.info(f"converting file {local_file} to mseed ...")
     # TODO: substitute the c++ program with the real mseed converter
     mseed_converter_process = subprocess.run(  # noqa
-        args=f"cd ..; ./mseed-app/main {cli_parameters}",
+        args=f"{converter_app} {cli_parameters}",
         # noqa
         shell=True,  # noqa
         check=True,

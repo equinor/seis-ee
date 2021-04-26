@@ -46,3 +46,18 @@ So slink command looks like;
 ```bash
 slinktool -S 'NS_ASK,<...>,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
 ```
+
+
+# Testing
+
+docker-compose run converter behave /app/tests/features/python_wrapper_mseed_converter.feature
+
+
+check that mseed converter programs are avaialble in docker image
+docker-compose run converter ./segdconv
+
+
+How to check that mseed converter program can be executed
+docker-compose run converter ldd segdconv
+
+

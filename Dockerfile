@@ -1,4 +1,4 @@
-FROM registry.git.equinor.com/sentry/decimate:latest
+FROM ghcr.io/equinor/decimate:latest
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
@@ -13,17 +13,15 @@ RUN pip install poetry
 RUN poetry config virtualenvs.create false
 
 
-#build c++ program
-# todo perhaps move this to separate docker-compose service or something??
-WORKDIR /mseed-app
-ADD /mseed_converter /mseed-app
-RUN g++ -g -o main main.cpp
-
 WORKDIR /app/
 COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
 ADD app /app/
+
+COPY --from=ghcr.io/equinor/segd-to-miniseed segdconv /app
+COPY --from=ghcr.io/equinor/segy-to-miniseed segyconv /app
+
 RUN chown -R seis:seis /app
 USER seis
 
