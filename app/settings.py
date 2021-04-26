@@ -10,6 +10,11 @@ class FieldStorageContainers(Enum):
     SNORRE = "snorre"
 
 
+class DecimatedFileTypes(Enum):
+    SEGD = "segd"
+    SEGY = "segy"
+
+
 # Pydantic config loading ref: https://fastapi.tiangolo.com/advanced/settings/
 # Will use env variables, and set default. Also parses complex data as json-strings
 class Settings(BaseSettings):

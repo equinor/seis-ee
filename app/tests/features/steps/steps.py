@@ -2,13 +2,13 @@ import json
 from datetime import datetime
 from pathlib import Path
 from behave import given, when, then
-
+import os
 from classes.event import Event
 from event_listener import events
 from services.az_files_service import az_files_service
 from services.blob_service import BlobService
 from services.queue_service import convert_queue
-from settings import FieldStorageContainers
+from settings import FieldStorageContainers, DecimatedFileTypes
 from azure.storage.queue import QueueMessage
 from mseed_converter import convert_to_mseed
 
@@ -71,12 +71,16 @@ def add_msg_to_convert_queue(context, format, path):
     convert_queue.send_message({"format": format.replace('"', ""), "path": path.replace('"', "")})
 
 
-@then("the file {file} has been created in {target_dir}")
-def step_impl(context, file, target_dir):
+@then('after converting a "{station}" file, "{filename}" has been created in "{target_dir}"')
+def contert_to_mseed(context, filename: str, target_dir: str, station: DecimatedFileTypes):
     convert_msg: QueueMessage = convert_queue.fetch_message()
     message_content: dict = json.loads(convert_msg.content)
     azure_storage_decimated_file_path: str = message_content["path"]
-    convert_to_mseed(azure_storage_decimated_file_path)
-    convert_to_mseed(azure_storage_decimated_file_path)
+    convert_to_mseed(azure_storage_decimated_file_path, station)
+    os.path.exists(f"{target_dir}/{filename}")
 
-    # todo add an assert to check if file has been created - when mseed converter is finished
+
+@given('output file "{filepath}" does not exist')
+def remove_file(context, filepath: str):
+    if os.path.exists(filepath):
+        os.remove(filepath)
