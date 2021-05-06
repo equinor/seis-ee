@@ -1,0 +1,16 @@
+[Unit]
+Description=Seiscomp
+Requires=earthworm.service
+[Service]
+ExecStart=/home/earthworm/seiscomp/bin/seiscomp start
+RemainAfterExit=yes
+ExecStop=/home/earthworm/seiscomp/bin/seiscomp stop
+ExecReload=/home/earthworm/seiscomp/bin/seiscomp restart
+#Restart=<What to do when service exits, killed, or timed-out   always|no|on-failure>
+#RestartSec=<int seconds>
+User=earthworm
+Group=earthworm
+
+[Install]
+# When to start the service. multi-user = after network, graphical.target = after GUI
+WantedBy=multi-user.target

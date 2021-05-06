@@ -1,0 +1,26 @@
+[Unit]
+Description=Earthworm auto startstop
+Before=seiscomp.service
+[Service]
+ExecStart=/home/earthworm/ew/earthworm_7.10/bin/startstop
+#Restart=<What to do when service exits, killed, or timed-out   always|no|on-failure>
+#RestartSec=<int seconds>
+User=earthworm
+Group=earthworm
+Environment=EW_PARAMS=/home/earthworm/ew/earthworm_7.10/run/params/
+Environment=EW_BITS=64
+Environment=EW_DATA_DIR=/home/earthworm/ew/earthworm_7.10/run/data/
+Environment=EW_VERSION=earthworm_7.10
+Environment=EW_INST_ID=INST_NNSN
+Environment=EW_LOG=/home/earthworm/ew/earthworm_7.10/run/log/
+Environment=EW_RUN_DIR=/home/earthworm/ew/earthworm_7.10/run
+Environment=EW_HOME=/home/earthworm/ew/earthworm_7.10
+Environment=EW_INSTALLATION=INST_UNKNOWN
+Environment=PATH=/home/earthworm/ew/earthworm_7.10/bin
+Environment=SYS_NAME=localhost
+StandardOutput=file:/data/ew/logs/startstop.log
+StandardError=file:/data/ew/logs/startstop_error.log
+[Install]
+# When to start the service. multi-user = after network, graphical.target = after GUI
+WantedBy=multi-user.target
+#Requires=< list of prerequisites services>
