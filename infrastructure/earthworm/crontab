@@ -19,6 +19,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
 47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
 52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
-0  4    * * sat root    /sbin/shutdown -r now
-@reboot seiscomp start
+0  1    * * sat root    /sbin/shutdown -r now
+0  4    * * sat root    bash /home/earthworm/disk_cleanup.sh > /home/earthworm/cronlog.txt 2>&1
+# Moved to systemd service @reboot seiscomp start
 #
