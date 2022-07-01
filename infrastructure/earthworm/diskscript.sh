@@ -1,6 +1,8 @@
+#! /usr/bin/env bash
 DISK_NAME=/dev/sdb
 DISK_PERCENTAGE_USED=$(df -Ph $DISK_NAME | grep -Po '\d+(?=%)')
 DISK_PERCENTAGE_LIMIT=80
+LOG_FILES_DIR=/data/ew/earthworm_7.10/run/log
 
 SERVICES=(earthworm seiscomp)
 echo "Disk percentage used: ${DISK_PERCENTAGE_USED}"
@@ -18,3 +20,6 @@ then
     sudo systemctl start ${SERVICES[@]}
 
 fi
+
+# Remove log files older than 10 days
+find "$LOG_FILES_DIR" -mtime +10 -type f -delete
