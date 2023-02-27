@@ -1,0 +1,10 @@
+[Unit]
+Description=mSeed HNet Streaming with SeisComp4 SLinkTool from NNSN (Equinor stations)
+
+[Service]
+User=hnet-admin
+ExecStart=/seiscomp/seiscomp/bin/slinktool -S 'NS_BAS02,NS_BAS03,NS_BAS0D,NS_BAS15,NS_BAS16,NS_BAS17,NS_GRA01,NS_GRA02,NS_GRA03,NS_GRA04,NS_GRA05,NS_GRA06,NS_GRA07,NS_GRA08,NS_GRA09,NS_GRA10,NS_OSE01,NS_OSE02,NS_OSE03,NS_OSE04,NS_OSE05,NS_OSE06,NS_OSE07,NS_OSE08,NS_OSE09,NS_OSE10' -SDS /ccs-passive/mseed/nnsn-equinor 10.1.1.3
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
