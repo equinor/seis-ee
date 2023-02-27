@@ -1,0 +1,10 @@
+[Unit]
+Description=mSeed ringserver serving all data, including Equinor data
+
+[Service]
+User=hnet-admin
+ExecStart=/usr/local/bin/ringserver -Rd /ccs-passive/mseed/ -L 18000 -MSSCAN "/ccs-passive/mseed StateFile=/ccs-passive/mseed/scan.state InitCurrentState=y" -I "Equinor MiniSeed Streamer"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
