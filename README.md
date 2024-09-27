@@ -46,3 +46,9 @@ So slink command looks like;
 ```bash
 slinktool -S 'NS_ASK,<...>,NS_VBYGD' -SDS /ccs-passive/mseed/nnsn 10.1.0.2
 ```
+
+
+# How to
+
+## run locally
+* The file permissions for the data (shared volume in docker compose) folder needs to be updated. Write the command "sudo chown 1000:1000 -R data" when in the root folder.
