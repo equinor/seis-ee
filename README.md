@@ -6,6 +6,10 @@ _Seismic data processing workflow_
 
 A workflow for processing raw segy/su seismic files into a more managable and monitoring friendly miniSeed format.
 
+> [!IMPORTANT]
+> Most of the content in this repo is not in use for the moment (23.6.2025).  
+> What is in use is mostly the configuration found in the `/infrastructure/`-folder.
+
 ## Architecture
 
 ![arc](./architecture.drawio.svg)

@@ -8,7 +8,7 @@ User=earthworm
 Group=earthworm
 
 StandardOutput=file:/data/ew/logs/email-event.log
-StandardError=file:/data/ew/logs/email-event-error.log
+StandardError=file:/data/ew/logs/email-event.log
 [Install]
 # When to start the service. multi-user = after network, graphical.target = after GUI
 WantedBy=multi-user.target

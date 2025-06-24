@@ -2,12 +2,10 @@
 Description=Seiscomp
 Requires=earthworm.service
 [Service]
-ExecStart=/home/earthworm/seiscomp/bin/seiscomp start
+ExecStart=/home/earthworm/seiscomp-ubu-22/bin/seiscomp start
 RemainAfterExit=yes
-ExecStop=/home/earthworm/seiscomp/bin/seiscomp stop
-ExecReload=/home/earthworm/seiscomp/bin/seiscomp restart
-#Restart=<What to do when service exits, killed, or timed-out   always|no|on-failure>
-#RestartSec=<int seconds>
+ExecStop=/home/earthworm/seiscomp-ubu-22/bin/seiscomp stop
+ExecReload=/home/earthworm/seiscomp-ubu-22/bin/seiscomp restart
 User=earthworm
 Group=earthworm
 

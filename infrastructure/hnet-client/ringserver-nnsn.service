@@ -1,9 +1,9 @@
+# This instance of the ringserver only streams data that are going to NNSN
 [Unit]
 Description=mSeed ringserver
 
 [Service]
 User=hnet-admin
-# Documentation https://github.com/iris-edu/ringserver/blob/master/doc/ringserver.md
 ExecStart=/usr/local/bin/ringserver -Rd /ccs-passive/mseed/nnsn/ -L 18000 -MSSCAN "/ccs-passive/mseed/nnsn StateFile=/ccs-passive/mseed/nnsn/scan.state InitCurrentState=y" -I "Equinor MiniSeed Streamer"
 Restart=always
 

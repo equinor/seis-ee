@@ -1,3 +1,4 @@
+# This one is no longer needed as Earthworm is streaming directly from NNSN (24.6.2025)
 [Unit]
 Description=mSeed HNet Streaming with SeisComp4 SLinkTool from NNSN
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=mSeed HNet Streaming with SeisComp4 SLinkTool from NNSN (Equinor stations)
+Description=mSeed HNet Streaming (ingress) with SeisComp4 SLinkTool from NNSN (Equinor stations, encrypted over wireguard)
 
 [Service]
 User=hnet-admin

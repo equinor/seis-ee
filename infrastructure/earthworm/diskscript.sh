@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #set -euox pipefail
-DISK_NAME=/dev/sdb
+DISK_NAME=/dev/sda
 DISK_PERCENTAGE_USED=$(df -Ph $DISK_NAME | grep -Po '\d+(?=%)')
 DISK_PERCENTAGE_LIMIT=80
 LOG_FILES_DIR=/data/ew/earthworm_7.10/run/log
